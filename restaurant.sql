@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Már 22. 23:15
+-- Létrehozás ideje: 2024. Ápr 21. 18:18
 -- Kiszolgáló verziója: 10.4.32-MariaDB
--- PHP verzió: 8.2.12
+-- PHP verzió: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,230 +24,254 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `asztalok`
+-- Tábla szerkezet ehhez a táblához `admin`
 --
 
-CREATE TABLE `asztalok` (
-  `asztalId` int(6) NOT NULL,
-  `asztalKod` int(3) NOT NULL,
-  `ferohely` int(2) NOT NULL,
-  `idopont` datetime DEFAULT NULL,
-  `idotartam` time NOT NULL,
-  `helyseg` varchar(50) NOT NULL,
-  `dohanyzo_hely` tinyint(1) NOT NULL
+CREATE TABLE `admin` (
+  `adminId` int(2) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
+  `profilePic` varchar(100) NOT NULL,
+  `adminMail` varchar(100) NOT NULL,
+  `adminPassword` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `admin`
+--
+
+INSERT INTO `admin` (`adminId`, `firstName`, `lastName`, `profilePic`, `adminMail`, `adminPassword`) VALUES
+(3, 'Róbert', 'Varró', '20240421181328.png', 'robertvarro12@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `reservation`
+--
+
+CREATE TABLE `reservation` (
+  `tableId` int(11) NOT NULL,
+  `registrationId` int(11) NOT NULL,
+  `reservationTime` date NOT NULL,
+  `period` date NOT NULL,
+  `reservationCode` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `dolgozo`
+-- Tábla szerkezet ehhez a táblához `table`
 --
 
-CREATE TABLE `dolgozo` (
-  `dolgozoId` int(3) NOT NULL,
-  `keresztnev` varchar(50) NOT NULL,
-  `vezeteknev` varchar(50) NOT NULL,
-  `profilkep` varchar(100) DEFAULT NULL,
-  `dolgozoEmail` varchar(100) NOT NULL,
-  `dolgozoJelszo` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- A tábla adatainak kiíratása `dolgozo`
---
-
-INSERT INTO `dolgozo` (`dolgozoId`, `keresztnev`, `vezeteknev`, `profilkep`, `dolgozoEmail`, `dolgozoJelszo`) VALUES
-(1, 'Robert', 'Varro', 'logInPic.jpg', 'varrorobert03@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
-
--- --------------------------------------------------------
-
---
--- Tábla szerkezet ehhez a táblához `foglalas`
---
-
-CREATE TABLE `foglalas` (
-  `asztalid` int(11) NOT NULL,
-  `regisztraloid` int(11) NOT NULL,
-  `foglalasidopont` date NOT NULL,
-  `idotartam` date NOT NULL,
-  `foglalaskod` int(6) NOT NULL
+CREATE TABLE `table` (
+  `tableId` int(6) NOT NULL,
+  `tableCode` int(3) NOT NULL,
+  `capacity` int(2) NOT NULL,
+  `reservationTime` datetime NOT NULL,
+  `period` time NOT NULL,
+  `area` varchar(50) NOT NULL,
+  `smokingArea` tinyint(1) NOT NULL,
+  `workerId` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `latogatasokszama`
+-- Tábla szerkezet ehhez a táblához `user`
 --
 
-CREATE TABLE `latogatasokszama` (
-  `latogatasId` int(6) NOT NULL,
-  `latogatasDatum` datetime NOT NULL,
-  `latogatokSzama` int(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Tábla szerkezet ehhez a táblához `latogato`
---
-
-CREATE TABLE `latogato` (
-  `latogatoId` int(6) NOT NULL,
-  `latogatasIdo` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Tábla szerkezet ehhez a táblához `regisztralo`
---
-
-CREATE TABLE `regisztralo` (
-  `regisztraloId` int(6) NOT NULL,
-  `keresztnev` varchar(50) NOT NULL,
-  `vezeteknev` varchar(50) NOT NULL,
-  `telefonszam` int(10) NOT NULL,
-  `regisztraloEmail` varchar(100) NOT NULL,
-  `regisztraloJelszo` varchar(60) NOT NULL,
-  `profilkep` varchar(100) DEFAULT NULL,
+CREATE TABLE `user` (
+  `registrationId` int(6) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
+  `phoneNumber` int(10) NOT NULL,
+  `userMail` varchar(100) NOT NULL,
+  `userPassword` varchar(60) NOT NULL,
+  `profilePic` varchar(100) DEFAULT NULL,
   `verification_code` int(50) DEFAULT NULL,
-  `verify` int(11) NOT NULL
+  `verify` int(11) NOT NULL,
+  `verification_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `banned` tinyint(1) NOT NULL,
+  `banned_time` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `regisztralo`
+-- A tábla adatainak kiíratása `user`
 --
 
-INSERT INTO `regisztralo` (`regisztraloId`, `keresztnev`, `vezeteknev`, `telefonszam`, `regisztraloEmail`, `regisztraloJelszo`, `profilkep`, `verification_code`, `verify`) VALUES
-(6, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', NULL, 401081, 0),
-(7, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', NULL, 102107, 0),
-(8, 'Robert', 'Varro', 644300022, 'vrobert1976@gmail.com', '$2y$10$6/uAicjSHhrmJc7sTO492uX4gZKJGNMNo8/6dSwKD7cPHsf0kpdim', 'Bob.jpg', 358901, 1),
-(11, 'Dominik', 'Hupko', 179420637, 'hupkodominik143@gmail.com', '$2y$10$pDSkDGh3QMNmw2k1xHR3IucBdYN7lyjrVaCg1xth0JV71hl8EsFJG', 'logInPic.jpg', 790057, 0);
+INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`) VALUES
+(6, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', NULL, 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
+(7, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', NULL, 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
+(8, 'Robert', 'Varro', 644300022, 'vrobert1976@gmail.com', '$2y$10$6/uAicjSHhrmJc7sTO492uX4gZKJGNMNo8/6dSwKD7cPHsf0kpdim', 'Bob.jpg', 358901, 1, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
+(11, 'Dominik', 'Hupko', 179420637, 'hupkodominik143@gmail.com', '$2y$10$pDSkDGh3QMNmw2k1xHR3IucBdYN7lyjrVaCg1xth0JV71hl8EsFJG', 'logInPic.jpg', 790057, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
+(20, 'Dominik', 'Varro', 109420637, 'varrorobert03@gmail.com', '$2y$10$NcikGMqqCB8V3xySpl7ELeixCeGY.krJMweCyIPgQOxu73CJOd2Ry', '20240421162153.jpg', 162292, 1, '2024-04-21 16:31:15.000000', 0, '2024-04-21 16:20:20.474952');
 
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `rendszergazda`
+-- Tábla szerkezet ehhez a táblához `visitor`
 --
 
-CREATE TABLE `rendszergazda` (
-  `rendszerGazdaId` int(2) NOT NULL,
-  `keresztnev` varchar(50) NOT NULL,
-  `vezeteknev` varchar(50) NOT NULL,
-  `profilkep` varchar(100) NOT NULL,
-  `rendszerGazdaEmail` varchar(100) NOT NULL,
-  `rendszerGazdaJelszo` varchar(100) NOT NULL
+CREATE TABLE `visitor` (
+  `visitorId` int(6) NOT NULL,
+  `visitDate` datetime NOT NULL,
+  `visitId` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- A tábla adatainak kiíratása `rendszergazda`
+-- Tábla szerkezet ehhez a táblához `visitorcount`
 --
 
-INSERT INTO `rendszergazda` (`rendszerGazdaId`, `keresztnev`, `vezeteknev`, `profilkep`, `rendszerGazdaEmail`, `rendszerGazdaJelszo`) VALUES
-(3, 'Róbert', 'Varró', 'logInPic.jpg', 'robertvarro12@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
+CREATE TABLE `visitorcount` (
+  `visitId` int(6) NOT NULL,
+  `visitDate` datetime NOT NULL,
+  `visitorcount` int(6) NOT NULL,
+  `adminId` int(2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `worker`
+--
+
+CREATE TABLE `worker` (
+  `workerId` int(3) NOT NULL,
+  `firstName` varchar(50) NOT NULL,
+  `lastName` varchar(50) NOT NULL,
+  `profilePic` varchar(50) NOT NULL,
+  `workerMail` varchar(100) NOT NULL,
+  `workerPassword` varchar(100) NOT NULL,
+  `adminId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexek a kiírt táblákhoz
 --
 
 --
--- A tábla indexei `asztalok`
+-- A tábla indexei `admin`
 --
-ALTER TABLE `asztalok`
-  ADD PRIMARY KEY (`asztalId`);
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`adminId`);
 
 --
--- A tábla indexei `dolgozo`
+-- A tábla indexei `reservation`
 --
-ALTER TABLE `dolgozo`
-  ADD PRIMARY KEY (`dolgozoId`);
+ALTER TABLE `reservation`
+  ADD PRIMARY KEY (`tableId`,`registrationId`),
+  ADD KEY `regisztraloid` (`registrationId`);
 
 --
--- A tábla indexei `foglalas`
+-- A tábla indexei `table`
 --
-ALTER TABLE `foglalas`
-  ADD PRIMARY KEY (`asztalid`,`regisztraloid`),
-  ADD KEY `regisztraloid` (`regisztraloid`);
+ALTER TABLE `table`
+  ADD PRIMARY KEY (`tableId`,`workerId`),
+  ADD KEY `dolgozoId` (`workerId`);
 
 --
--- A tábla indexei `latogatasokszama`
+-- A tábla indexei `user`
 --
-ALTER TABLE `latogatasokszama`
-  ADD PRIMARY KEY (`latogatasId`);
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`registrationId`);
 
 --
--- A tábla indexei `latogato`
+-- A tábla indexei `visitor`
 --
-ALTER TABLE `latogato`
-  ADD PRIMARY KEY (`latogatoId`);
+ALTER TABLE `visitor`
+  ADD PRIMARY KEY (`visitorId`,`visitId`),
+  ADD KEY `latogatasId` (`visitId`);
 
 --
--- A tábla indexei `regisztralo`
+-- A tábla indexei `visitorcount`
 --
-ALTER TABLE `regisztralo`
-  ADD PRIMARY KEY (`regisztraloId`);
+ALTER TABLE `visitorcount`
+  ADD PRIMARY KEY (`visitId`,`adminId`),
+  ADD KEY `adminId` (`adminId`);
 
 --
--- A tábla indexei `rendszergazda`
+-- A tábla indexei `worker`
 --
-ALTER TABLE `rendszergazda`
-  ADD PRIMARY KEY (`rendszerGazdaId`);
+ALTER TABLE `worker`
+  ADD PRIMARY KEY (`workerId`,`adminId`),
+  ADD KEY `rendszergazdaId` (`adminId`);
 
 --
 -- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT a táblához `asztalok`
+-- AUTO_INCREMENT a táblához `admin`
 --
-ALTER TABLE `asztalok`
-  MODIFY `asztalId` int(6) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `admin`
+  MODIFY `adminId` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT a táblához `dolgozo`
+-- AUTO_INCREMENT a táblához `table`
 --
-ALTER TABLE `dolgozo`
-  MODIFY `dolgozoId` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `table`
+  MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT a táblához `latogatasokszama`
+-- AUTO_INCREMENT a táblához `user`
 --
-ALTER TABLE `latogatasokszama`
-  MODIFY `latogatasId` int(6) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `user`
+  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT a táblához `latogato`
+-- AUTO_INCREMENT a táblához `visitor`
 --
-ALTER TABLE `latogato`
-  MODIFY `latogatoId` int(6) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `visitor`
+  MODIFY `visitorId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT a táblához `regisztralo`
+-- AUTO_INCREMENT a táblához `visitorcount`
 --
-ALTER TABLE `regisztralo`
-  MODIFY `regisztraloId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+ALTER TABLE `visitorcount`
+  MODIFY `visitId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT a táblához `rendszergazda`
+-- AUTO_INCREMENT a táblához `worker`
 --
-ALTER TABLE `rendszergazda`
-  MODIFY `rendszerGazdaId` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `worker`
+  MODIFY `workerId` int(3) NOT NULL AUTO_INCREMENT;
 
 --
 -- Megkötések a kiírt táblákhoz
 --
 
 --
--- Megkötések a táblához `asztalok`
+-- Megkötések a táblához `reservation`
 --
-ALTER TABLE `asztalok`
-  ADD CONSTRAINT `asztalok_ibfk_1` FOREIGN KEY (`asztalId`) REFERENCES `foglalas` (`asztalid`);
+ALTER TABLE `reservation`
+  ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`registrationId`) REFERENCES `user` (`registrationId`),
+  ADD CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`tableId`) REFERENCES `table` (`tableId`);
 
 --
--- Megkötések a táblához `foglalas`
+-- Megkötések a táblához `table`
 --
-ALTER TABLE `foglalas`
-  ADD CONSTRAINT `foglalas_ibfk_1` FOREIGN KEY (`regisztraloid`) REFERENCES `regisztralo` (`regisztraloId`);
+ALTER TABLE `table`
+  ADD CONSTRAINT `table_ibfk_1` FOREIGN KEY (`workerId`) REFERENCES `worker` (`workerId`);
+
+--
+-- Megkötések a táblához `visitor`
+--
+ALTER TABLE `visitor`
+  ADD CONSTRAINT `visitor_ibfk_1` FOREIGN KEY (`visitId`) REFERENCES `visitorcount` (`visitId`);
+
+--
+-- Megkötések a táblához `visitorcount`
+--
+ALTER TABLE `visitorcount`
+  ADD CONSTRAINT `visitorcount_ibfk_1` FOREIGN KEY (`adminId`) REFERENCES `admin` (`adminId`);
+
+--
+-- Megkötések a táblához `worker`
+--
+ALTER TABLE `worker`
+  ADD CONSTRAINT `worker_ibfk_1` FOREIGN KEY (`adminId`) REFERENCES `admin` (`adminId`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
