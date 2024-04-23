@@ -13,14 +13,19 @@
     <label for="pass">Jelszó</label><br>
     <input type="password" placeholder="********" name="pass" class="inputok" id="pass"><br>
 
-    <input type="submit" name="action" value="Bejelentkezes" class="inputok">
+    <input type="submit" name="action" value="Bejelentkezes" class="inputok"><br><br>
+    <a href="resetPassword.php">Forgot your password? </a>
     <?php
     include "connection.php";
     global $conn;
 
     $message=isset($_SESSION['message']) ? $_SESSION['message']:'';
 if(isset($_SESSION['message'])) {
-    echo "<p class='warning'>" . $message . "</p>";
+    if($_SESSION['message'] == "Most már be bír jelentkezni")
+    { echo "<p class='success'>" . $message . "</p>";}
+    else{echo "<p class='warning'>" . $message . "</p>";}
+
+
 
 
 }?>

@@ -46,45 +46,144 @@
 <nav class="navbar navbar-expand-lg bg-black">
     <div class="container-fluid">
 
-        <a href="#" id="logo" ><h2>R&D</h2></a>
+        <a href="#" id="logo"><h2>R&D</h2></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon right"></span>
         </button>
         <?php
-        include  "connection.php";
+        include "connection.php";
         global $conn;
-        if (isset($_SESSION['email']) && isset($_SESSION['name'])  && isset($_SESSION['profilePic'])) {
-            $sql = "SELECT * FROM admin";
-            $stmt = $conn->query($sql);
+        if ($conn) {
 
-            $_SESSION['message'] = "";
-            if ($stmt->num_rows > 0)
-                while ($row = $stmt->fetch_assoc())
-                    if ($_SESSION['email'] == $row['adminMail']) {
+            if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+                $sql = "SELECT * FROM admin";
+                $stmt = $conn->query($sql);
 
-                        echo "<li><a class=\"dropdown-item\" href=\"admin.php\"><i class=\"bi bi-list-task\"></i> Tables</a></li>";
-                    echo "<li><a class=\"dropdown-item\" href=\"users.php\"><i class=\"bi bi-people\"></i> Users</a></li>";
-                    echo "<li><a class=\"dropdown-item\" href=\"workers.php\"><i class=\"bi bi-person-workspace\"></i> Workers</a></li>";
+                $_SESSION['message'] = "";
+                if ($stmt->num_rows > 0)
+                    while ($row = $stmt->fetch_assoc())
+                        if ($_SESSION['email'] == $row['adminMail']) {
 
-                }}
+                            echo "<li><a class=\"dropdown-item\" href=\"admin.php\"><i class=\"bi bi-list-task\"></i> Tables</a></li>";
+                            echo "<li><a class=\"dropdown-item\" href=\"users.php\"><i class=\"bi bi-people\"></i> Users</a></li>";
+                            echo "<li><a class=\"dropdown-item\" href=\"workers.php\"><i class=\"bi bi-person-workspace\"></i> Workers</a></li>";
+
+                        }
+            }
+
+        } else {
+            echo "<a href='login.php' class='nav-link dropdown-item'><i class=\"bi bi-person\"></i>Connection Error!</a>";
+        }
 
         ?>
         <div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
             <ul class="navbar-nav ">
                 <li class="nav-item dropdown ">
                     <div class="dropdown d-flex  ">
-                        <nav class="btn btn-secondary me-2 "  data-bs-toggle="dropdown" aria-expanded="false">
+                        <nav class="btn btn-secondary me-2 " data-bs-toggle="dropdown" aria-expanded="false">
                             <?php
                             global $conn;
-                            if (isset($_SESSION['email']) && isset($_SESSION['name'])  && isset($_SESSION['profilePic'])) {
-                                $eMail = $_SESSION['email'];
-                                $name = $_SESSION['name'];
+                            if ($conn) {
+                                if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+                                    $eMail = $_SESSION['email'];
+                                    $name = $_SESSION['name'];
 
-                                $profilePic = $_SESSION['profilePic'];
-                                echo '<li class="nav-item">';
-                                echo "<img class=\"profilePic\" src=\"http://localhost:/Restaurant2.0/pictures/{$profilePic}\" width=\"50\" height=\"50\" alt=\"profilkep\">";
+                                    $profilePic = $_SESSION['profilePic'];
+                                    echo '<li class="nav-item">';
+                                    echo "<img class=\"profilePic\" src=\"http://localhost:/Restaurant2.0/pictures/{$profilePic}\" width=\"50\" height=\"50\" alt=\"profilkep\">";
 
 
+                                    $sql = "SELECT * FROM admin";
+                                    $stmt = $conn->query($sql);
+
+                                    $_SESSION['message'] = "";
+                                    if ($stmt->num_rows > 0)
+                                        while ($row = $stmt->fetch_assoc())
+                                            if ($_SESSION['email'] == $row['adminMail']) {
+
+                                                echo "<a>Admin</a>";
+                                                echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
+                                                echo "</li>";
+
+                                            }
+
+
+                                    $sql = "SELECT * FROM worker";
+                                    $stmt = $conn->query($sql);
+
+                                    $_SESSION['message'] = "";
+                                    if ($stmt->num_rows > 0)
+                                        while ($row = $stmt->fetch_assoc())
+                                            if ($_SESSION['email'] == $row['workerMail']) {
+
+                                                echo "<a>Worker</a>";
+                                                echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
+                                                echo "</li>";
+
+                                                // If no match found for the email address
+
+                                            }
+                                    $sql = "SELECT * FROM user";
+                                    $stmt = $conn->query($sql);
+
+                                    $_SESSION['message'] = "";
+                                    if ($stmt->num_rows > 0)
+                                        while ($row = $stmt->fetch_assoc())
+                                            if ($_SESSION['email'] == $row['userMail']) {
+
+                                                echo "<a>Guest</a>";
+                                                echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
+                                                echo "</li>";
+                                            }
+
+
+                                    // Display user's name and logout link
+
+
+                                } else {
+                                    echo "<a href='logIn.php' class='nav-link dropdown-item'><i class=\"bi bi-person\"></i>Account</a>";
+                                }
+                            } else {
+                                echo "<a href='login.php' class='nav-link dropdown-item'><i class=\"bi bi-person\"></i>Connection Error!</a>";
+                            }
+                            ?>
+                        </nav>
+
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
+                            <li><?php
+                                if ($conn) {
+                                    if (isset($_SESSION['email']) && isset($_SESSION['name'])) { //A session segitsegevel megadjuk az adatok ertekeit
+                                        $eMail = $_SESSION['email'];
+                                        $name = $_SESSION['name'];
+                                        $profilePic = $_SESSION['profilePic'];
+
+
+                                        echo "<a class=\"dropdown-item\" href=\"functions.php?action=kijelentkezes\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
+                                        echo "<i class=\"bi bi-door-open\"></i> Log out</a>";
+
+                                        echo "<a class=\"dropdown-item\"  onclick=' activateProfilePicture()'>";
+                                        //ahelyet hogy két gom kattintással kiválasztjuk majd elküldjük a képet, ez a két
+                                        // fügvény egy gombnyomással és fájl kiválasztással elintézi nekünk
+                                        //a link kattitntásával elvezett minket pictureInput hoz ahova a profilképet feltöltjük
+                                        //ami azért szükséges, mert a file gombnak a stilusat nem tudjuk változtani, ezért láthatatlan
+                                        // és ezért aktivájuk egy linken keresztül
+                                        echo "<i class=\"bi bi-person-square\"></i> Change picture</a>";
+                                        echo "<form method='post' action='functions.php' enctype='multipart/form-data'>";
+
+                                        echo "<input class=\"dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
+                                        //láthatatlan, viszont kell a profilkép feltöltéshez
+                                        //Miután a képet feltöltöttük, az aktivája a fügvényt ami automatikusan megnyomja a sumbit gombot
+                                        echo "<input type='submit' name='action' id='submitButton' value='picture' style='display: none;'>";
+                                        //láthatatlan, a kép feltöltésének a végrehajtására szükség
+                                        echo "</form>";
+
+
+                                    } else {
+                                        echo "<a href='logIn.php' class='dropdown-item'><i class=\"bi bi-person\"></i> Log in</a>";
+                                        echo "<a href='registration.php' class='dropdown-item'><i class=\"bi bi-person-plus\"></i> Registration</a></li>";
+                                    }
+
+                                    if (isset($_SESSION['email'])) {
                                         $sql = "SELECT * FROM admin";
                                         $stmt = $conn->query($sql);
 
@@ -92,101 +191,14 @@
                                         if ($stmt->num_rows > 0)
                                             while ($row = $stmt->fetch_assoc())
                                                 if ($_SESSION['email'] == $row['adminMail']) {
-
-                                                    echo "<a>Admin</a>";
-                                                    echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
-                                                    echo "</li>";
-
-                                                    }
-
-
-                                        $sql = "SELECT * FROM worker";
-                                        $stmt = $conn->query($sql);
-
-                                        $_SESSION['message'] = "";
-                                        if ($stmt->num_rows > 0)
-                                            while ($row = $stmt->fetch_assoc())
-                                                if ($_SESSION['email'] == $row['workerMail']) {
-
-                                                    echo "<a>Worker</a>";
-                                                    echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
-                                                    echo "</li>";
-
-                                            // If no match found for the email address
-
-                                        }
-                                        $sql = "SELECT * FROM user";
-                                        $stmt = $conn->query($sql);
-
-                                        $_SESSION['message'] = "";
-                                        if ($stmt->num_rows > 0)
-                                            while ($row = $stmt->fetch_assoc())
-                                                if ($_SESSION['email'] == $row['userMail']) {
-
-                                                    echo "<a>Guest</a>";
-                                                    echo "<a> <i class=\"bi bi-person\"></i> $name</a>";
-                                                    echo "</li>";
+                                                    echo "<li>" . $_SESSION['message'] . "</li>";
                                                 }
-
-
-                                // Display user's name and logout link
-
-
-                            }
-                             else {
-                                echo "<a href='logIn.php' class='nav-link dropdown-item'><i class=\"bi bi-person\"></i>Account</a>";
-                            }
-                            ?>
-                        </nav>
-
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuLink">
-                            <li><?php
-                                if (isset($_SESSION['email']) && isset($_SESSION['name'])) { //A session segitsegevel megadjuk az adatok ertekeit
-                                    $eMail = $_SESSION['email'];
-                                    $name = $_SESSION['name'];
-                                    $profilePic = $_SESSION['profilePic'];
-
-
-                                    echo "<a class=\"dropdown-item\" href=\"functions.php?action=kijelentkezes\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
-                                    echo "<i class=\"bi bi-door-open\"></i> Log out</a>";
-
-                                    echo "<a class=\"dropdown-item\"  onclick=' activateProfilePicture()'>";
-                                    //ahelyet hogy két gom kattintással kiválasztjuk majd elküldjük a képet, ez a két
-                                    // fügvény egy gombnyomással és fájl kiválasztással elintézi nekünk
-                                    //a link kattitntásával elvezett minket pictureInput hoz ahova a profilképet feltöltjük
-                                    //ami azért szükséges, mert a file gombnak a stilusat nem tudjuk változtani, ezért láthatatlan
-                                    // és ezért aktivájuk egy linken keresztül
-                                    echo "<i class=\"bi bi-person-square\"></i> Change picture</a>";
-                                    echo "<form method='post' action='functions.php' enctype='multipart/form-data'>";
-
-                                    echo "<input class=\"dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
-                                    //láthatatlan, viszont kell a profilkép feltöltéshez
-                                    //Miután a képet feltöltöttük, az aktivája a fügvényt ami automatikusan megnyomja a sumbit gombot
-                                    echo "<input type='submit' name='action' id='submitButton' value='picture' style='display: none;'>";
-                                    //láthatatlan, a kép feltöltésének a végrehajtására szükség
-                                    echo "</form>";
-
-
-                                } else {
-                                    echo "<a href='logIn.php' class='dropdown-item'><i class=\"bi bi-person\"></i> Log in</a>";
-                                    echo "<a href='registration.php' class='dropdown-item'><i class=\"bi bi-person-plus\"></i> Registration</a></li>";
+                                    }
                                 }
-
-                                    if(isset($_SESSION['email'])){
-                                    $sql = "SELECT * FROM admin";
-                                    $stmt = $conn->query($sql);
-
-                                    $_SESSION['message'] = "";
-                                    if ($stmt->num_rows > 0)
-                                    while ($row = $stmt->fetch_assoc())
-                                    if ($_SESSION['email'] == $row['adminMail']) {
-                                        echo "<li>".$_SESSION['message']."</li>";
-                                    }}
-                                    ?>
+                                ?>
 
                         </ul>
                     </div>
-
 
 
                 </li>

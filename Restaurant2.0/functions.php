@@ -7,6 +7,7 @@ use PHPMailer\PHPMailer\Exception;
 
 include "connection.php";
 
+
 class Functions
 {
 
@@ -33,6 +34,9 @@ class Functions
                 case 'picture':
                     $this->picture();
                     break;
+                case 'ResetPass':
+                    $this->resetPassword();
+                    break;
                 default:
                     echo "Nope";
             }
@@ -46,6 +50,84 @@ class Functions
                     break;
 
             }
+        }
+    }
+
+    public function resetPassword()
+
+    {
+        global $conn;
+        if (isset($_POST['mail']) && isset($_POST['resetPassword']) && isset($_POST['confirmPassword'])) {
+            $mail = $_POST['mail'];
+            $pass = $_POST['resetPassword'];
+            $pass2 = $_POST['confirmPassword'];
+
+            if ($mail == '') {
+                $_SESSION['message'] = "Nincsen kitöltve az <b>Email</b> mező";
+                header('Location: resetPassword.php');
+                exit();
+            }
+
+            if ($pass == '') {
+                $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszó</b> mező";
+                header('Location: resetPassword.php');
+                exit();
+            }
+            if ($pass2 == '') {
+                $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszóbiztosítása</b> mező";
+                header('Location: resetPassword.php');
+                exit();
+            }
+            if ($pass != $pass2) {
+                $_SESSION['message'] = "Nem eggyezik a jelszó";
+                header('Location: resetPassword.php');
+                exit();
+            }
+            if (!(preg_match("/[a-z]/", $pass))) {
+                $_SESSION['message'] = "Nincsen <b>kisbetű</b> a jelszóban";
+                header('Location: logIn.php');
+                exit();
+
+            }
+            if (!(preg_match("/[A-Z]/", $pass))) {
+                $_SESSION['message'] = "Nincsen <b>nagybetű</b> a jelszóban";
+                header('Location: resetPassword.php');
+                exit();
+
+            }
+            if (!(preg_match("/[0-9]+/", $pass))) {
+                $_SESSION['message'] = "Nem tartalmaz <b>számokat</b> a jelszó";
+                header('Location: resetPassword.php');
+                exit();
+
+            }
+            if (strlen($pass) < 8) {
+                $_SESSION['message'] = "A jelszó legalább<b> 8 karaktert</b> kell hogy tartalmazzon";
+                header('Location: resetPassword.php');
+                exit();
+            }
+
+
+            $time = time();
+            $expire = date("Y-m-d H:i:s", $time + 60 * 5);
+            $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+
+            $stmt = mysqli_prepare($conn, "UPDATE user SET passwordValidation=?,passwordValidationTime=? where userMail=?");
+
+            $stmt->bind_param("sss", $verification_code, $expire, $mail);
+            $_SESSION['verification_code'] = $verification_code;
+            if ($stmt->execute()) {
+                $_SESSION['email'] = $mail;
+                $_SESSION['resetPassword'] = $pass;
+                $_SESSION['message'] = "Nezze meg az emailjeit.";
+                header('Location: mail.php');
+                exit();
+            } else {
+                $_SESSION['message'] = "Something went wrong.";
+                header('Location: resetPassword.php');
+                exit();
+            }
+
         }
     }
 
@@ -70,7 +152,7 @@ class Functions
                     $file_size = $_FILES["picture"]["size"];
                     $file_type = $_FILES["picture"]["type"];
                     $file_error = $_FILES['picture']["error"];
-                   // The full path as submitted by the browser.
+                    // The full path as submitted by the browser.
                     // This value does not always contain a real directory structure, and cannot be trusted. Available as of PHP 8.1.0.
 
 
@@ -82,11 +164,11 @@ class Functions
 
                     if (!exif_imagetype($file_temp)) {
                         $_SESSION['message'] = "File is not a picture!";
-                    header('location:  index.php');
-                    exit();
+                        header('location:  index.php');
+                        exit();
                     }
-                    $file_size=$file_size/1024;
-                    if ($file_size> 200) {
+                    $file_size = $file_size / 1024;
+                    if ($file_size > 200) {
                         $_SESSION['message'] = "File is to big!";
                         header('location:  index.php');
                         exit();
@@ -169,118 +251,116 @@ class Functions
     {
         global $conn;
 
-                $sql = "SELECT * FROM admin";
-                $stmt = $conn->query($sql);
+        $sql = "SELECT * FROM admin";
+        $stmt = $conn->query($sql);
 
-                $_SESSION['message'] = "";
-                if ($stmt->num_rows > 0) {
-                    while ($row = $stmt->fetch_assoc()) {
-                        if ($_POST['mail'] == $row['adminMail']) {
-                            session_start();
-                            if (password_verify($_POST['pass'], $row['adminPassword'])) {
-
-
-                                $_SESSION['message'] = "";
-                                $_SESSION['email'] = $row['adminMail'];
-                                $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
-                                $_SESSION['profilePic'] = $row['profilePic'];
+        $_SESSION['message'] = "";
+        if ($stmt->num_rows > 0) {
+            while ($row = $stmt->fetch_assoc()) {
+                if ($_POST['mail'] == $row['adminMail']) {
+                    session_start();
+                    if (password_verify($_POST['pass'], $row['adminPassword'])) {
 
 
-                                // Store relevant user information in session variables
+                        $_SESSION['message'] = "";
+                        $_SESSION['email'] = $row['adminMail'];
+                        $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
+                        $_SESSION['profilePic'] = $row['profilePic'];
 
 
-                                // Redirect the user to the main page
-                                header('Location: index.php');
-                                exit();
-                            } else {
-                                $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
-                                header('Location: logIn.php');
-                                exit();
-                            }
-                        }
+                        // Store relevant user information in session variables
+
+                        sleep(2);
+                        // Redirect the user to the main page
+                        header('Location: index.php');
+                        exit();
+                    } else {
+                        $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
+                        sleep(2);
+                        header('Location: logIn.php');
+                        exit();
                     }
-                    // If no match found for the email address
-
-                }
-                $sql = "SELECT * FROM worker";
-                $stmt = $conn->query($sql);
-
-                $_SESSION['message'] = "";
-                if ($stmt->num_rows > 0) {
-                    while ($row = $stmt->fetch_assoc()) {
-                        if ($_POST['mail'] == $row['workerMail']) {
-                            session_start();
-                            if (password_verify($_POST['pass'], $row['workerPassword'])) {
-
-
-                                $_SESSION['message'] = "";
-                                $_SESSION['email'] = $row['workerMail'];
-                                $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
-                                $_SESSION['profilePic'] = $row['profilePic'];
-
-
-                                // Store relevant user information in session variables
-
-
-                                // Redirect the user to the main page
-                                header('Location:index.php');
-                                exit();
-                            } else {
-                                $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
-                                header('Location: logIn.php');
-                                exit();
-                            }
-                        }
-                    }
-                    // If no match found for the email address
-
-                }
-                $sql = "SELECT * FROM user";
-                $stmt = $conn->query($sql);
-
-                $_SESSION['message'] = "";
-                if ($stmt->num_rows > 0) {
-                    while ($row = $stmt->fetch_assoc()) {
-                        if ($_POST['mail'] == $row['userMail']) {
-                            session_start();
-                            if (password_verify($_POST['pass'], $row['userPassword'])) {
-                                if ($row['banned'] == 1) {
-                                    $_SESSION['message'] = "A felhasználó <b>Bannolva lett</b> ,nem bír belépni az oldalra.";
-                                    header('Location: logIn.php');
-                                    exit();
-                                }
-
-                                $_SESSION['message'] = "";
-                                $_SESSION['email'] = $row['userMail'];
-                                $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
-                                $_SESSION['profilePic'] = $row['profilePic'];
-
-
-                                // Store relevant user information in session variables
-
-
-                                // Redirect the user to the main page
-                                header('Location:  index.php');
-                                exit();
-                            } else {
-                                $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
-                                header('Location: logIn.php');
-                                exit();
-                            }
-                        }
-                    }
-                    // If no match found for the email address
-                    $_SESSION['message'] = "Nincsen ilyen <b>Email</b> cim regisztralva.";
-                    header('Location: logIn.php');
-                    exit();
-                } else {
-                    // If no users found in the database
-                    $_SESSION['message'] = "Nincsenek felhasználók.";
-                    header('Location: logIn.php');
-                    exit();
                 }
             }
+            // If no match found for the email address
 
+        }
+        $sql = "SELECT * FROM worker";
+        $stmt = $conn->query($sql);
+
+        $_SESSION['message'] = "";
+        if ($stmt->num_rows > 0) {
+            while ($row = $stmt->fetch_assoc()) {
+                if ($_POST['mail'] == $row['workerMail']) {
+                    session_start();
+                    if (password_verify($_POST['pass'], $row['workerPassword'])) {
+
+
+                        $_SESSION['message'] = "";
+                        $_SESSION['email'] = $row['workerMail'];
+                        $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
+                        $_SESSION['profilePic'] = $row['profilePic'];
+
+
+                        // Store relevant user information in session variables
+
+
+                        // Redirect the user to the main page
+                        sleep(2);
+                        header('Location:index.php');
+                        exit();
+                    } else {sleep(2);
+                        $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
+                        header('Location: logIn.php');
+                        exit();
+                    }
+                }
+            }
+            // If no match found for the email address
+
+        }
+        $sql = "SELECT * FROM user";
+        $stmt = $conn->query($sql);
+
+        $_SESSION['message'] = "";
+        if ($stmt->num_rows > 0) {
+            while ($row = $stmt->fetch_assoc()) {
+                if ($_POST['mail'] == $row['userMail']) {
+                    session_start();
+                    if (password_verify($_POST['pass'], $row['userPassword'])) {
+
+
+                        $_SESSION['message'] = "";
+                        $_SESSION['email'] = $row['userMail'];
+                        $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
+                        $_SESSION['profilePic'] = $row['profilePic'];
+
+
+                        // Store relevant user information in session variables
+
+
+                        // Redirect the user to the main page
+
+                        header('Location:  index.php');sleep(2);
+                        exit();
+                    } else {sleep(2);
+                        $_SESSION['message'] = "Nem jo a <b>jelszó</b>.";
+                        header('Location: logIn.php');
+                        exit();
+                    }
+                }
+            }
+            // If no match found for the email address
+            $_SESSION['message'] = "Nincsen ilyen <b>Email</b> cim regisztralva.";
+            header('Location: logIn.php');
+            exit();
+        } else {
+            // If no users found in the database
+            $_SESSION['message'] = "Nincsenek felhasználók.";
+            header('Location: logIn.php');
+            exit();
+        }
+    }
 
 
     public function registration()
@@ -411,65 +491,70 @@ class Functions
                                 $_SESSION['message'] = "Nem sikerült a <b>Regisztráció</b> győződjön meg arról hogy jól vitte be az email címét vagy hogy nem regisztrált-e már";
                                 header('Location: registration.php');
                                 exit();
+                            } else {
+
+                                $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+                                $query = mysqli_prepare($conn, "UPDATE user SET verification_code = ? ,verification_time =? WHERE userMail = ?");
+                                $query->bind_param("sss", $verification_code, $verification_time, $mail);
+                                $query->execute();
+                                $_SESSION['message'] = "Ha ön szerint az<b>E-mail</b> cím nincs regisztrálva van, akkor próbálja újra";
+                                $_SESSION['verification_code'] = $verification_code;
+                                $_SESSION['email'] = $mail;
+
+                                header('Location: mail.php');
+
+                                exit();
                             }
 
 
-                            $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-                            $query = mysqli_prepare($conn, "UPDATE user SET verification_code = ? ,verification_time =? WHERE userMail = ?");
-                            $query->bind_param("sss", $verification_code, $verification_time, $mail);
-                            $query->execute();
-                            $_SESSION['message'] = "Ha ön szerint az<b>E-mail</b> cím nincs regisztrálva van, akkor próbálja újra";
-                            $_SESSION['verification_code'] = $verification_code;
-                            $_SESSION['mail'] = $mail;
-
-                            header('Location: mail.php');
-
-                            exit();
-
                         }
-
-
                     }
+
+
+                    $kep = "logInPic.png";
+
+
+                    // Send email
+
+                    // Hash the password
+                    $pass = password_hash($pass, PASSWORD_BCRYPT);
+                    $verification_code = substr(number_format(time() * rand(), 0, '',
+                        ''), 0, 7);
+                    $banned = 0;
+
+                    $banned_time = 0;
+                    $verification_code_expire = 0;
+                    $verification_code_pass = 0;
+
+                    // Insert user data into the database
+                    $sql = "INSERT INTO user (firstName, lastName, phoneNumber, userMail, userPassword, verification_code,verify,profilePic,
+                  verification_time,banned,banned_time,passwordValidation,passwordValidationTime) VALUES (?,?,?,?, ?, ?, ?,?, ?,?,?,?,?)";
+                    $stmt = $conn->prepare($sql);
+                    $verrification = 0; // Placeholder for verification_code
+                    $stmt->bind_param("ssissiississs", $knev, $vnev, $tel, $mail, $pass, $verification_code,
+                        $verrification, $kep, $verification_time, $banned, $banned_time, $verification_code_pass, $verification_code_expire);
+
+                    if ($stmt->execute()) {
+                        $_SESSION['message'] = "We sent an email to you!";
+
+                        $_SESSION['verification_code'] = $verification_code;
+                        $_SESSION['mail'] = $mail;
+                        header('Location: mail.php');
+                        exit(); // Exit script after redirection
+                    } else {
+                        $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
+                        header('Location: registration.php');
+                        exit();
+                    }
+
                 }
-
-
-                $kep = "logInPic.jpg";
-
-
-                // Send email
-
-                // Hash the password
-                $pass = password_hash($pass, PASSWORD_BCRYPT);
-                $verification_code = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-
-                $jogosultsag = "Felhasznalo";
-
-                // Insert user data into the database
-                $sql = "INSERT INTO user (firstName, lastName, phoneNumber, userMail, userPassword, verification_code,verify,profilkep,verification_time) VALUES (?,?, ?, ?, ?,?, ?,?,?)";
-                $stmt = $conn->prepare($sql);
-                $verrification = 0; // Placeholder for verification_code
-                $stmt->bind_param("ssissiiss", $knev, $vnev, $tel, $mail, $pass, $verification_code, $verrification, $kep, $verification_time);
-
-                if ($stmt->execute()) {
-                    $_SESSION['message'] = "";
-
-                    $_SESSION['verification_code'] = $verification_code;
-                    $_SESSION['mail'] = $mail;
-                    header('Location: mail.php');
-                    exit(); // Exit script after redirection
-                } else {
-                    $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
-                }
-
             } catch (Exception $e) {
                 echo "An error occurred: " . $e->getMessage();
             }
         }
 
     }
-
 }
-
 $registration = new Functions();
 
 ?>

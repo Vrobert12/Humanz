@@ -13,7 +13,7 @@ $mail = new PHPMailer(true);
 try {
     header('Location:email-verification.php');
     //Server settings
-    if(isset($_SESSION['mail'])){
+    if(isset($_SESSION['email'])){
     $mail->SMTPDebug = SMTP::DEBUG_SERVER;
     $mail->isSMTP();
     $mail->Host = 'mail.humanz.stud.vts.su.ac.rs';
@@ -32,7 +32,11 @@ else{
 
     }
     $mail->setFrom('humanz@humanz.stud.vts.su.ac.rs', 'Mailer');
-    $mail->addAddress($_SESSION['mail'], 'Varró Róbert');
+if(isset($_SESSION['email'])) {
+
+    $mail->addAddress($_SESSION['email'], 'Varró Róbert');
+}
+
     $mail->addReplyTo('info@example.com', 'Information');
     $mail->addCC('cc@example.com');
     $mail->addBCC('bcc@example.com');
@@ -41,9 +45,9 @@ else{
     $mail->AltBody = "Your code:<br><h3>".$_SESSION['verification_code']."</h3>";
     $mail->send();
     if(isset($_POST['mail']))
-    $_POST['mail']=$_SESSION['mail'];
+    $_POST['mail']=$_SESSION['email'];
     exit();
 
 } catch (Exception $e) {
-    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    $_SESSION['message'] =  "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 }
