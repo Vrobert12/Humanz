@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Ápr 21. 18:18
+-- Létrehozás ideje: 2024. Ápr 23. 15:41
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.0.30
 
@@ -41,7 +41,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`adminId`, `firstName`, `lastName`, `profilePic`, `adminMail`, `adminPassword`) VALUES
-(3, 'Róbert', 'Varró', '20240421181328.png', 'robertvarro12@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
+(3, 'Róbert', 'Varró', '20240421201538.jpg', 'robertvarro12@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
 
 -- --------------------------------------------------------
 
@@ -92,19 +92,21 @@ CREATE TABLE `user` (
   `verify` int(11) NOT NULL,
   `verification_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
   `banned` tinyint(1) NOT NULL,
-  `banned_time` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+  `banned_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `passwordValidation` int(10) NOT NULL,
+  `passwordValidationTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- A tábla adatainak kiíratása `user`
 --
 
-INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`) VALUES
-(6, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', NULL, 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
-(7, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', NULL, 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
-(8, 'Robert', 'Varro', 644300022, 'vrobert1976@gmail.com', '$2y$10$6/uAicjSHhrmJc7sTO492uX4gZKJGNMNo8/6dSwKD7cPHsf0kpdim', 'Bob.jpg', 358901, 1, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
-(11, 'Dominik', 'Hupko', 179420637, 'hupkodominik143@gmail.com', '$2y$10$pDSkDGh3QMNmw2k1xHR3IucBdYN7lyjrVaCg1xth0JV71hl8EsFJG', 'logInPic.jpg', 790057, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000'),
-(20, 'Dominik', 'Varro', 109420637, 'varrorobert03@gmail.com', '$2y$10$NcikGMqqCB8V3xySpl7ELeixCeGY.krJMweCyIPgQOxu73CJOd2Ry', '20240421162153.jpg', 162292, 1, '2024-04-21 16:31:15.000000', 0, '2024-04-21 16:20:20.474952');
+INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
+(6, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
+(7, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
+(8, 'Robert', 'Varro', 644300022, 'vrobert1976@gmail.com', '$2y$10$6/uAicjSHhrmJc7sTO492uX4gZKJGNMNo8/6dSwKD7cPHsf0kpdim', 'logInPic.png', 358901, 1, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
+(17, 'Dominik', 'Varro', 101231232, 'varrorobert03@gmail.com', '$2y$10$Pcgka6CW.hKnBdt6N3jezuKO5W0urSVDfbtPSIsftsn7rDLpjYoEO', 'logInPic.png', 168122, 1, '2024-04-23 15:37:50.000000', 0, '0000-00-00 00:00:00.000000', 357330, '2024-04-23 15:38:03.000000'),
+(18, 'Dominik', 'Hupko', 109420637, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 2442334, 1, '2024-04-23 15:31:22.000000', 0, '0000-00-00 00:00:00.000000', 233122, '2024-04-23 15:28:06.000000');
 
 -- --------------------------------------------------------
 
@@ -142,10 +144,18 @@ CREATE TABLE `worker` (
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
   `profilePic` varchar(50) NOT NULL,
+  `phoneNumber` int(10) NOT NULL,
   `workerMail` varchar(100) NOT NULL,
   `workerPassword` varchar(100) NOT NULL,
   `adminId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `worker`
+--
+
+INSERT INTO `worker` (`workerId`, `firstName`, `lastName`, `profilePic`, `phoneNumber`, `workerMail`, `workerPassword`, `adminId`) VALUES
+(1, 'Adam', 'Laszlo', 'logInPic.png', 123456, 'laci@gmail.com', '$2a$12$vLsIP..QTClqkbVF8ZI4g.54aDE28I56Yn6qEua6KgFhcsXkHIdC2', 3);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -218,7 +228,7 @@ ALTER TABLE `table`
 -- AUTO_INCREMENT a táblához `user`
 --
 ALTER TABLE `user`
-  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT a táblához `visitor`
@@ -236,7 +246,7 @@ ALTER TABLE `visitorcount`
 -- AUTO_INCREMENT a táblához `worker`
 --
 ALTER TABLE `worker`
-  MODIFY `workerId` int(3) NOT NULL AUTO_INCREMENT;
+  MODIFY `workerId` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Megkötések a kiírt táblákhoz
