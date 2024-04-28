@@ -75,13 +75,13 @@ if (isset($_COOKIE['count'])) {
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
                         if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
-                            echo "<li><a class=\"d-block d-lg-none dropdown-item\" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i></a></li>";
-                            echo "<li><a class=\"d-block d-lg-none dropdown-item\" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i></a></li>";
-                            echo "<li><a class=\"d-block d-lg-none dropdown-item\" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i></a></li>";
+                            echo "<li><a class=\"d-block d-lg-none \" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i></a></li>";
+                            echo "<li><a class=\"d-block d-lg-none \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i></a></li>";
+                            echo "<li><a class=\"d-block d-lg-none \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i></a></li>";
 
-                            echo "<li><a class=\"d-none d-lg-block dropdown-item\" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i> Tables</a></li>";
-                            echo "<li><a class=\"d-none d-lg-block dropdown-item\" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i> Users</a></li>";
-                            echo "<li><a class=\"d-none d-lg-block dropdown-item\" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i> Workers</a></li>";
+                            echo "<li><a class=\"d-none d-lg-block \" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i> Tables</a></li>";
+                            echo "<li><a class=\"d-none d-lg-block \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i> Users</a></li>";
+                            echo "<li><a class=\"d-none d-lg-block \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i> Workers</a></li>";
                         }
 
             } else {

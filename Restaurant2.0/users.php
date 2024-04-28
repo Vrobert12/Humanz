@@ -58,7 +58,7 @@
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);
 
-                $_SESSION['message'] = "";
+
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
                         if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
@@ -76,10 +76,7 @@
         </form>
            <a href="#" class="bar d-block d-lg-none"><h2><i class="fa-3x bi bi-person-video"></i></i>  </h2></a>
             <a href="#" class="bar d-none d-lg-block"> <h2>  Users</h2></a>';
-                            $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-                            $_SESSION['previousPage']="workers.php";
-                            echo "<li><a class=\"justify-content-end\" href=\"registration.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
-                        }
+                       }
 
             } else {
 
@@ -122,7 +119,7 @@
         $sql = "SELECT * FROM user";
         $stmt = $conn->query($sql);
 
-        $_SESSION['message'] = "";echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
+     echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
         if ($stmt->num_rows > 0)
 
             while ($row = $stmt->fetch_assoc())

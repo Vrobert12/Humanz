@@ -62,7 +62,7 @@ global $conn;
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);
 
-                $_SESSION['message'] = "";
+
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
                         if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
@@ -127,7 +127,7 @@ $_SESSION['previousPage']="workers.php";
                             $sql = "SELECT * FROM user";
                             $stmt = $conn->query($sql);
 
-                            $_SESSION['message'] = "";echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
+                           echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
                             if ($stmt->num_rows > 0)
 
                                 while ($row = $stmt->fetch_assoc())
@@ -197,8 +197,10 @@ $_SESSION['previousPage']="workers.php";
 if(isset($_SESSION['message']) && $_SESSION['message'] != "")
 echo "<div class='mainBlock rounded bg-dark text-white'><h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
 " . $_SESSION['message'] . "</h1></div>";
+
 $_SESSION['message'] = "";
 ?>
+
 </body>
 </html>
 <?php
