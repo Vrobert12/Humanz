@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-$server="localhost";
+$server="127.0.0.1";
 $user="root";
 $pass="";
 $base="restaurant";

@@ -8,8 +8,11 @@
 </head>
 <body>
 <form method="post" action="functions.php" class="mainForm">
-    <label for="mail">E-mail</label><br>
-    <input type="email" placeholder="Emailcím" name="mail" class="inputok" id="mail"><br>
+
+    <input type="hidden" placeholder="Emailcím" name="mail" class="inputok" id="mail" value="<?php
+    if(isset($_SESSION['email'])){echo $_SESSION['email'];}
+    ?>"><br>
+    <label><b>Change Your password.</b></label><br><br>
     <label for="password">Your new password:</label><br>
     <input type="password" class="inputok" placeholder="********" name="resetPassword"  id="pass"><br>
     <label for="confirmPassword">Confirm your new password:</label><br>
@@ -23,7 +26,7 @@
 
     $message=isset($_SESSION['message']) ? $_SESSION['message']:'';
     if(isset($_SESSION['message'])) {
-        echo "<p class='warning'>" . $message . "</p>";
+        echo "<p class='success'>" . $message . "</p>";
 
 
     }?>

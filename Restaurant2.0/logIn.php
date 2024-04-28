@@ -14,9 +14,18 @@
     <input type="password" placeholder="********" name="pass" class="inputok" id="pass"><br>
 
     <input type="submit" name="action" value="Bejelentkezes" class="inputok"><br><br>
-    <a href="resetPassword.php">Forgot your password? </a>
     <?php
     include "connection.php";
+    $_SESSION['token'] = $verification_token = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+    $_SESSION['previousPage']="logIn.php";
+
+    echo'  <a href="resetPassword-mail.php?logToken='. $_SESSION['token'].'">Forgot your password? </a><br><br>';
+    ?>
+
+    <label for="mail">Don't have a account?</label><br><br>
+    <a href="registration.php">Register here! </a><br>
+    <?php
+
     global $conn;
 
     $message=isset($_SESSION['message']) ? $_SESSION['message']:'';
