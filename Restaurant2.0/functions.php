@@ -433,6 +433,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
     public function login()
     {
         global $conn;
+
         $mail = $_POST['mail'];
         $password = $_POST['pass'];
 
@@ -444,13 +445,20 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
         $_SESSION['message'] = "";
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                if ($password != "") {
+                if ($row['userPassword']== "") {
+                    $errorText = "The worker did not set up a password!";
+                    $logType = "Log in";
+                    $logMessage = "You have to create a password!";
+                    $stmt->close();
+                    $this->errorLogInsert($mail, $errorText, $logType, $logMessage);
+                    header('Location:resetPassword.php');
+                    exit();
+                    }
 
 
-                    session_start();
                     if (password_verify($password, $row['userPassword'])) {
 
-
+                        session_start();
                         $_SESSION['message'] = "";
                         $_SESSION['email'] = $row['userMail'];
                         $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
@@ -475,18 +483,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                         exit();
 
                     }
-                } else {
-                    $errorText = "The worker did not set up a password!";
-                    $logType = "Log in";
-                    $logMessage = "You have to create a password!";
-                    $stmt->close();
-                    $this->errorLogInsert($mail, $errorText, $logType, $logMessage);
-                    $_SESSION['mailReset'] = $mail;
-                    $_SESSION['resetCode'] = substr(number_format(time() * rand(), 0, '', ''), 0, 7);
-                    header('Location:mail.php');
-                    exit();
 
-                }
             }
 
         } else {
@@ -515,7 +512,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
         $stmt = $conn->prepare($sql);
 
         if (!$stmt) {
-            die('Error in SQL query: ' . $conn->error);
+            $_SESSION['message']='Error in SQL query: ' . $conn->error;
         }
 
         $stmt->bind_param("ssss", $logType, $mail, $errorText, $currentTime);
