@@ -24,7 +24,7 @@ try {
     $mail->Port = 587;
     $mail->setFrom('humanz@humanz.stud.vts.su.ac.rs', 'Mailer');
 
-if(isset($_SESSION['email'])&& !empty($_SESSION['email']) && isset($_SESSION['verification_code'])) {
+if(isset($_SESSION['email'])&& !empty($_SESSION['email']) && isset($_SESSION['verification_code']) && !isset($_SESSION["workerEmail"])) {
 
     $mail->addAddress($_SESSION['email'], 'Varró Róbert');
     $mail->addReplyTo('info@example.com', 'Information');
