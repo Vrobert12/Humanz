@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Ápr 23. 15:41
+-- Létrehozás ideje: 2024. Ápr 30. 18:26
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.0.30
 
@@ -24,24 +24,69 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `admin`
+-- Tábla szerkezet ehhez a táblához `errorlog`
 --
 
-CREATE TABLE `admin` (
-  `adminId` int(2) NOT NULL,
-  `firstName` varchar(50) NOT NULL,
-  `lastName` varchar(50) NOT NULL,
-  `profilePic` varchar(100) NOT NULL,
-  `adminMail` varchar(100) NOT NULL,
-  `adminPassword` varchar(100) NOT NULL
+CREATE TABLE `errorlog` (
+  `errorLogId` int(11) NOT NULL,
+  `errorType` varchar(30) NOT NULL,
+  `errorMail` varchar(100) NOT NULL,
+  `errorText` text NOT NULL,
+  `errorTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `admin`
+-- A tábla adatainak kiíratása `errorlog`
 --
 
-INSERT INTO `admin` (`adminId`, `firstName`, `lastName`, `profilePic`, `adminMail`, `adminPassword`) VALUES
-(3, 'Róbert', 'Varró', '20240421201538.jpg', 'robertvarro12@gmail.com', '$2a$12$/YkfY2GW29N/J7wb0E.mVupaSBsibaP3aA5EW9INUNSOA8EZcLBNq');
+INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `errorTime`) VALUES
+(1, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-24 10:54:34.000000'),
+(2, 'Log in', 'robertvarro1fd2@gmail.com', 'Not registered E-mail!', '2024-04-24 10:54:49.000000'),
+(3, 'Password change', 'robertvarro123@gmail.com', 'Not registered E-mail!', '2024-04-24 10:59:50.000000'),
+(4, 'E-mail validation', 'varrorobert03@gmail.com', 'The validation code is not correct!', '2024-04-24 11:18:29.000000'),
+(5, 'E-mail validation', 'varrorobert03@gmail.com', 'The validation code is not correct!', '2024-04-24 11:19:42.000000'),
+(6, 'E-mail validation', 'varrorobert03@gmail.com', 'Time for validation has expired', '2024-04-24 11:21:34.000000'),
+(7, 'E-mail validation', 'varrorobert03@gmail.com', 'Time for validation has expired', '2024-04-24 11:23:54.000000'),
+(8, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-25 07:51:58.000000'),
+(9, 'Log in', 'hupkodominik1ee4rertg43@gmail.com', 'Not registered E-mail!', '2024-04-25 07:52:19.000000'),
+(10, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-27 14:25:52.000000'),
+(11, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-27 14:26:03.000000'),
+(12, 'Password change', 'robertvarro12@gmail.com', 'Not registered E-mail!', '2024-04-27 14:40:17.000000'),
+(13, 'Password change', 'robertvarro12@gmail.com', 'Not registered E-mail!', '2024-04-27 14:40:30.000000'),
+(14, 'Log in', '', 'Not registered E-mail!', '2024-04-27 15:55:55.000000'),
+(15, 'Log in', '', 'Not registered E-mail!', '2024-04-27 15:55:57.000000'),
+(16, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-27 17:06:15.000000'),
+(17, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-27 20:34:24.000000'),
+(18, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-27 21:18:09.000000'),
+(19, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-27 21:49:53.000000'),
+(20, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-27 21:51:25.000000'),
+(21, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-27 22:13:44.000000'),
+(22, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-28 22:24:59.000000'),
+(23, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-28 22:37:27.000000'),
+(24, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-28 22:45:12.000000'),
+(25, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-28 22:46:38.000000'),
+(26, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-28 22:46:52.000000'),
+(27, 'Adding a Worker', 'robertvarro12@gmail.com', 'The worker is already registered', '2024-04-28 22:47:16.000000'),
+(28, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:05:25.000000'),
+(29, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:06:52.000000'),
+(30, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:08:17.000000'),
+(31, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:10:24.000000'),
+(32, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:10:34.000000'),
+(33, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:11:10.000000'),
+(34, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:11:34.000000'),
+(35, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:11:50.000000'),
+(36, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:13:55.000000'),
+(37, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:14:21.000000'),
+(38, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:14:48.000000'),
+(39, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:16:30.000000'),
+(40, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:17:05.000000'),
+(41, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:18:18.000000'),
+(42, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-28 23:19:05.000000'),
+(43, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:19:33.000000'),
+(44, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:21:12.000000'),
+(45, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:22:16.000000'),
+(46, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:23:09.000000'),
+(47, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:25:00.000000');
 
 -- --------------------------------------------------------
 
@@ -88,6 +133,7 @@ CREATE TABLE `user` (
   `userMail` varchar(100) NOT NULL,
   `userPassword` varchar(60) NOT NULL,
   `profilePic` varchar(100) DEFAULT NULL,
+  `privilage` varchar(25) NOT NULL,
   `verification_code` int(50) DEFAULT NULL,
   `verify` int(11) NOT NULL,
   `verification_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
@@ -101,12 +147,12 @@ CREATE TABLE `user` (
 -- A tábla adatainak kiíratása `user`
 --
 
-INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
-(6, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
-(7, 'Nikoletta', 'Varro', 101231232, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
-(8, 'Robert', 'Varro', 644300022, 'vrobert1976@gmail.com', '$2y$10$6/uAicjSHhrmJc7sTO492uX4gZKJGNMNo8/6dSwKD7cPHsf0kpdim', 'logInPic.png', 358901, 1, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
-(17, 'Dominik', 'Varro', 101231232, 'varrorobert03@gmail.com', '$2y$10$Pcgka6CW.hKnBdt6N3jezuKO5W0urSVDfbtPSIsftsn7rDLpjYoEO', 'logInPic.png', 168122, 1, '2024-04-23 15:37:50.000000', 0, '0000-00-00 00:00:00.000000', 357330, '2024-04-23 15:38:03.000000'),
-(18, 'Dominik', 'Hupko', 109420637, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 2442334, 1, '2024-04-23 15:31:22.000000', 0, '0000-00-00 00:00:00.000000', 233122, '2024-04-23 15:28:06.000000');
+INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
+(6, 'Nikoletta', 'Varro', 0, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 'Guest', 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
+(7, 'Nikoletta', 'Varro', 0, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 'Guest', 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
+(18, 'Dominik', 'Hupko', 0, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 'Worker', 2442334, 1, '2024-04-23 15:31:22.000000', 0, '0000-00-00 00:00:00.000000', 233122, '2024-04-23 15:28:06.000000'),
+(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$BVxOJ0.rmhtkPKjPD3qVWOpu.BYpV5mzlu8Oc9Jki6j3.U2NSZ0xO', '20240428221953.png', 'Admin', 229527, 1, '2024-04-23 22:16:29.000000', 0, '0000-00-00 00:00:00.000000', 168654, '2024-04-28 21:07:45.000000'),
+(21, 'Dominik', 'Varro', 101231232, 'varrorobert03@gmail.com', '$2y$10$YypS3/w1baLb0v00.7zMAeWa0IlqvJzvKurchcImAy4Fn88XRg7em', 'logInPic.png', 'Worker', 4192141, 1, '2024-04-28 23:13:21.000000', 0, '0000-00-00 00:00:00.000000', 206910, '2024-04-28 23:15:44.000000');
 
 -- --------------------------------------------------------
 
@@ -133,39 +179,15 @@ CREATE TABLE `visitorcount` (
   `adminId` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Tábla szerkezet ehhez a táblához `worker`
---
-
-CREATE TABLE `worker` (
-  `workerId` int(3) NOT NULL,
-  `firstName` varchar(50) NOT NULL,
-  `lastName` varchar(50) NOT NULL,
-  `profilePic` varchar(50) NOT NULL,
-  `phoneNumber` int(10) NOT NULL,
-  `workerMail` varchar(100) NOT NULL,
-  `workerPassword` varchar(100) NOT NULL,
-  `adminId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- A tábla adatainak kiíratása `worker`
---
-
-INSERT INTO `worker` (`workerId`, `firstName`, `lastName`, `profilePic`, `phoneNumber`, `workerMail`, `workerPassword`, `adminId`) VALUES
-(1, 'Adam', 'Laszlo', 'logInPic.png', 123456, 'laci@gmail.com', '$2a$12$vLsIP..QTClqkbVF8ZI4g.54aDE28I56Yn6qEua6KgFhcsXkHIdC2', 3);
-
 --
 -- Indexek a kiírt táblákhoz
 --
 
 --
--- A tábla indexei `admin`
+-- A tábla indexei `errorlog`
 --
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`adminId`);
+ALTER TABLE `errorlog`
+  ADD PRIMARY KEY (`errorLogId`);
 
 --
 -- A tábla indexei `reservation`
@@ -202,21 +224,14 @@ ALTER TABLE `visitorcount`
   ADD KEY `adminId` (`adminId`);
 
 --
--- A tábla indexei `worker`
---
-ALTER TABLE `worker`
-  ADD PRIMARY KEY (`workerId`,`adminId`),
-  ADD KEY `rendszergazdaId` (`adminId`);
-
---
 -- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT a táblához `admin`
+-- AUTO_INCREMENT a táblához `errorlog`
 --
-ALTER TABLE `admin`
-  MODIFY `adminId` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `errorlog`
+  MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT a táblához `table`
@@ -228,7 +243,7 @@ ALTER TABLE `table`
 -- AUTO_INCREMENT a táblához `user`
 --
 ALTER TABLE `user`
-  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT a táblához `visitor`
@@ -243,12 +258,6 @@ ALTER TABLE `visitorcount`
   MODIFY `visitId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT a táblához `worker`
---
-ALTER TABLE `worker`
-  MODIFY `workerId` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- Megkötések a kiírt táblákhoz
 --
 
@@ -260,28 +269,10 @@ ALTER TABLE `reservation`
   ADD CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`tableId`) REFERENCES `table` (`tableId`);
 
 --
--- Megkötések a táblához `table`
---
-ALTER TABLE `table`
-  ADD CONSTRAINT `table_ibfk_1` FOREIGN KEY (`workerId`) REFERENCES `worker` (`workerId`);
-
---
 -- Megkötések a táblához `visitor`
 --
 ALTER TABLE `visitor`
   ADD CONSTRAINT `visitor_ibfk_1` FOREIGN KEY (`visitId`) REFERENCES `visitorcount` (`visitId`);
-
---
--- Megkötések a táblához `visitorcount`
---
-ALTER TABLE `visitorcount`
-  ADD CONSTRAINT `visitorcount_ibfk_1` FOREIGN KEY (`adminId`) REFERENCES `admin` (`adminId`);
-
---
--- Megkötések a táblához `worker`
---
-ALTER TABLE `worker`
-  ADD CONSTRAINT `worker_ibfk_1` FOREIGN KEY (`adminId`) REFERENCES `admin` (`adminId`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
