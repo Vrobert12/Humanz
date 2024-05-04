@@ -186,7 +186,7 @@
             // és ezért aktivájuk egy linken keresztül
             echo "<i class=\"bi bi-person-square\"></i> Change picture</a>";
             echo "<form method='post' action='functions.php' enctype='multipart/form-data'>";
-            $_SESSION['backPic']="users.php";
+
             echo "<input class=\"dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
             //láthatatlan, viszont kell a profilkép feltöltéshez
             //Miután a képet feltöltöttük, az aktivája a fügvényt ami automatikusan megnyomja a sumbit gombot
@@ -213,73 +213,33 @@ if(isset($_SESSION['message']) && $_SESSION['message'] != "")
 " . $_SESSION['message'] . "</h1></div>";
 $_SESSION['message'] = "";
 ?>
+
 </body>
 </html>
 <?php
+include "classUser.php";
 //A session segitsegevel megadjuk az adatok ertekeit
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
     if (isset($_POST['searchAction'])) {
         if ($_POST['searchAction'] == 'search') {
-            $data = "SELECT * FROM user where userMail= '" . $_POST['searchMail'] . "'";
-            users($data);
+
+            $usersData = new User("Guest",$_POST['searchMail'],"users.php");
+            $usersData->userString();
+
         } else {
-            users("SELECT * FROM user where privilage = 'Guest'");
+
+            $usersData = new User("Guest",0);
+            $usersData->userString();
         }
     } else {
-        users("SELECT * FROM user where privilage = 'Guest'");
-
+        $usersData = new User("Guest",0,"users.php");
+        $usersData->userString();
     }
+
+
 } else {
-    header('Location: index.php');
+    header('Location: index.php',"users.php");
     exit();
-}
-function users($command)
-{
-
-    global $conn;
-    $sql = $command;
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-
-    $result = $stmt->get_result();
-    if ($result->num_rows > 0) {
-
-        echo '<div class="container">
-  <div class="row justify-content-around" >';
-        while ($row = $result->fetch_assoc()) {
-
-            echo ' <div class="col-xl-4 p-4 border bg-dark" style="  
- margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0">';
-            echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" src=\"http://localhost:/Restaurant2.0/pictures/" . $row['profilePic'] . "
-          \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><label>ID: " . $row['registrationId'] . "</label><br>
-<label>First name: " . $row['firstName'] . "</label><br>
-<label>Last name: " . $row['lastName'] . "</label><br>
-<label>Phone number: " . $row['phoneNumber'] . "</label><br>
-<label>Email address: " . $row['userMail'] . "</label><br>";
-            if($row['verify']==1){
-                echo '<label style="color: green; font-size: 20px">Verified</label><br>';
-            }
-            else
-                echo '<label style="color: red; font-size: 20px">Not verified</label><br>';
-
-
-            if ($row['banned'] == 0) {
-                echo "<label style='color: green; font-size: 20px'>Not Banned</label>";
-            } else {
-                echo "<label style='color: red; font-size: 20px'>Banned</label><br><label> Ban time: " . $row['banned_time'] . "</label><br>";
-            }
-
-            echo "<form method='post' action='user.php'>
-<input type='hidden' name='id' value='" . $row['registrationId'] . "'>
-<input type='submit' class='more' name='userId' value='More info' >
-</form></div>";
-        }
-
-        echo "</div></div></div>";
-    } else {
-        $_SESSION['message']="<h2>No result.</h2>";
-    }
-
 }
 
 ?>

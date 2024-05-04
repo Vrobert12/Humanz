@@ -15,6 +15,7 @@ class Functions
     {
 
         $this->run();
+
     }
 
     public function run()
@@ -46,8 +47,17 @@ class Functions
                 case 'AddWorker':
                     $this->addWorker();
                     break;
+
+                case 'BanPerson':case 'UnBanPerson':
+                    $this->ban();
+                    break;
+                case 'AddTable':
+                $this->addTable();
+                break;
                 default:
-                    echo "Nope";
+                    $_SESSION['message'] = "Something went wrong in switch";
+                    header('Location:users.php');
+                    exit();
             }
         } elseif (isset($_SESSION['action'])) {
             //Hogyha a fő oldalról jelentkezünk ki akkor get metódust használunk, mivel egy link rákattintásával
@@ -61,6 +71,72 @@ class Functions
             }
         }
     }
+    public function addTable()
+    {
+        if (isset($_POST['cap']) && isset($_POST['ar'])) {
+            global $conn;
+            $cap = $_POST['cap'];
+            $ar = $_POST['ar'];
+            if(!empty($_POST['sm']))
+            {
+                $sm = "Yes";
+            }
+            else $sm = "No";
+            //$this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=".$_SESSION['token']);
+            try {
+                // SMTP settings
+                // Insert user data into the database
+                $sql = "INSERT INTO `table` (capacity, area, smokingArea) VALUES (?,?,?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iss", $cap, $ar, $sm);
+                if ($stmt->execute()) {
+                    $_SESSION['message'] = "Table added successfully!";
+                    $_SESSION['text'] = "<h2>Add table</h2>";
+                    header('Location: tables.php');
+                    exit(); // Exit script after redirection
+                } else {
+                    $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
+                    header('Location: addTable.php?token='.$_SESSION['token']);
+                    exit();
+                }
+            }
+            catch (Exception $e) {
+                $_SESSION['message'] = "An error occurred: " . $e->getMessage();
+            }
+        }
+    }
+public function ban()
+{
+    if(isset($_POST['ban'])){
+        try {
+            global $conn;
+            $time = time();
+            $currentTime = date("Y-m-d H:i:s", $time);
+            if ($_POST['ban'] == "yes") {
+                $sql = mysqli_prepare($conn, "UPDATE user SET banned=0,banned_time=0 WHERE userId=?");
+                $_SESSION['message'] = "The person is unbanned";
+                $sql->bind_param("i", $_POST['id']);
+            } else {
+                $sql = mysqli_prepare($conn, "UPDATE user SET banned=1,banned_time=? WHERE userId=?");
+                $_SESSION['message'] = "The person is banned";
+
+                $sql->bind_param("si", $currentTime, $_POST['id']);
+            }
+
+            $sql->execute();
+
+            header('Location:'.$_SESSION['previousPage']);
+            $_SESSION['previousPage'] = "";
+            exit();
+        }
+        catch (Exception $e) {
+            $_SESSION['message'] = "Something went wrong";
+            header('Location:'.$_SESSION['previousPage']);
+            $_SESSION['previousPage'] = "";
+            exit();
+        }
+    }
+}
 
     public function addWorker()
     {
@@ -77,7 +153,7 @@ class Functions
             $mail = $_POST['mail'];
             $_SESSION["workerEmail"] = $mail;
 
-            $this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=".$_SESSION['token']);
+            $this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=" . $_SESSION['token']);
             try {
                 // SMTP settings
                 $time = time() + 60 * 10;
@@ -90,7 +166,7 @@ class Functions
                     while ($rows = $stmtTeszt->fetch_assoc()) {
 
 
-                        if ( $rows["userMail"] == $mail) {
+                        if ($rows["userMail"] == $mail) {
                             $logType = "Adding a Worker";
                             $logText = "The worker is already registered";
                             $mail = $_SESSION['email'];
@@ -130,7 +206,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                         $banned, $banned_time, $verification_code_pass, $verification_code_expire);
 
                     if ($stmt->execute()) {
-                        $_SESSION['workerLink'] ="http://192.168.1.10/Restaurant2.0/resetPassword-mail.php";
+                        $_SESSION['workerLink'] = "http://192.168.1.10/Restaurant2.0/resetPassword-mail.php";
                         $_SESSION['message'] = "Woker added Successfully!";
                         $_SESSION['text'] = "<h2>Registration</h2>";
                         $_SESSION['verification_code'] = $verification_code;
@@ -139,7 +215,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                         exit(); // Exit script after redirection
                     } else {
                         $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
-                        header('Location: registration.php?token='.$_SESSION['token']);
+                        header('Location: registration.php?token=' . $_SESSION['token']);
                         exit();
                     }
 
@@ -191,9 +267,8 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                         exit();
                     }
                 }
-            }
-            else{
-                $_SESSION['message']="This Email address doesn't exist!";
+            } else {
+                $_SESSION['message'] = "This Email address doesn't exist!";
                 header('Location: resetPassword-mail.php');
                 exit();
             }
@@ -412,7 +487,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                 // Redirect to login page after successful upload
 
 
-                header('Location: '.$_SESSION['backPic']);
+                header('Location: ' . $_SESSION['backPic']);
                 exit(); // Exit after redirection
             }
         }
@@ -445,7 +520,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
         $_SESSION['message'] = "";
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                if ($row['userPassword']== "") {
+                if ($row['userPassword'] == "") {
                     $errorText = "The worker did not set up a password!";
                     $logType = "Log in";
                     $logMessage = "You have to create a password!";
@@ -453,36 +528,44 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                     $this->errorLogInsert($mail, $errorText, $logType, $logMessage);
                     header('Location:resetPassword.php');
                     exit();
-                    }
+                }
 
 
-                    if (password_verify($password, $row['userPassword'])) {
-
-                        session_start();
-                        $_SESSION['message'] = "";
-                        $_SESSION['email'] = $row['userMail'];
-                        $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
-                        $_SESSION['profilePic'] = $row['profilePic'];
-
-
-                        // Store relevant user information in session variables
-
-
-                        // Redirect the user to the main page
-
-                        header('Location:  index.php');
-                        sleep(2);
-                        exit();
-                    } else {
-                        $logText = "Wrong password!";
-                        $logType = "Log in";
-                        $logMessage = "The email or the password doesn't mach up!";
+                if (password_verify($password, $row['userPassword'])) {
+                    if ($row['banned']) {
+                        $logText = "User tried to log in while he is banned!";
+                        $logType = "Banned";
+                        $logMessage = "You have been banned from our website!";
                         $stmt->close();
                         $this->errorLogInsert($mail, $logText, $logType, $logMessage);
                         header('Location: logIn.php');
                         exit();
-
                     }
+                    session_start();
+                    $_SESSION['message'] = "";
+                    $_SESSION['email'] = $row['userMail'];
+                    $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
+                    $_SESSION['profilePic'] = $row['profilePic'];
+
+
+                    // Store relevant user information in session variables
+
+
+                    // Redirect the user to the main page
+
+                    header('Location:  index.php');
+                    sleep(2);
+                    exit();
+                } else {
+                    $logText = "Wrong password!";
+                    $logType = "Log in";
+                    $logMessage = "The email or the password doesn't mach up!";
+                    $stmt->close();
+                    $this->errorLogInsert($mail, $logText, $logType, $logMessage);
+                    header('Location: logIn.php');
+                    exit();
+
+                }
 
             }
 
@@ -499,41 +582,11 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
     }
 
-    public function errorLogInsert($mail, $errorText, $logType, $logMessage)
-    {
-        global $conn;
-
-        sleep(2);
-
-        $time = time();
-        $currentTime = date("Y-m-d H:i:s", $time);
-
-        $sql = "INSERT INTO errorlog( errorType, errorMail, errorText, errorTime) VALUES (?,?,?,?)";
-        $stmt = $conn->prepare($sql);
-
-        if (!$stmt) {
-            $_SESSION['message']='Error in SQL query: ' . $conn->error;
-        }
-
-        $stmt->bind_param("ssss", $logType, $mail, $errorText, $currentTime);
-
-        if ($stmt->execute()) {
-            $_SESSION['message'] = $logMessage;
-        } else {
-            $_SESSION['message'] = "NUAH.";
-        }
-
-        $stmt->close();
-
-
-    }
-
     public function registration()
     {
-
-        global $conn;
-
         if (isset($_POST['knev']) && isset($_POST['vnev']) && isset($_POST['tel1']) && isset($_POST['tel2']) && isset($_POST['mail']) && isset($_POST['pass']) && isset($_POST['pass2'])) {
+            global $conn;
+
             $knev = $_POST['knev'];
             $vnev = $_POST['vnev'];
             $tel1 = $_POST['tel1'];
@@ -552,8 +605,10 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
             try {
                 // SMTP settings
-                $time = time() + 60 * 10;
-                $verification_time = date("Y-m-d H:i:s", $time);
+                $time = time();
+                $verifyTime=time() + 60 * 10;
+                $verification_time = date("Y-m-d H:i:s", $verifyTime);
+                $currentTime = date("Y-m-d H:i:s", $time);
 
                 $sql = "SELECT userMail,verify,verification_time FROM user";
                 $stmtTeszt = $conn->query($sql);
@@ -603,13 +658,15 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                     $verification_code_pass = 0;
 
                     // Insert user data into the database
-                    $sql = "INSERT INTO user (firstName, lastName, phoneNumber, userMail, userPassword, verification_code,verify,profilePic,
-                 privilage,verification_time,banned,banned_time,passwordValidation,passwordValidationTime) 
-VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
+                    $sql = "INSERT INTO user (firstName, lastName, phoneNumber, userMail, userPassword,
+                  verification_code,verify,profilePic,
+                 privilage,registrationTime	,verification_time,banned,banned_time,passwordValidation,passwordValidationTime) 
+VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
                     $stmt = $conn->prepare($sql);
                     $verrification = 0; // Placeholder for verification_code
-                    $stmt->bind_param("ssissiisssisss", $knev, $vnev, $tel, $mail, $pass, $verification_code,
-                        $verrification, $kep, $privilage, $verification_time,
+                    $stmt->bind_param("ssissiissssisss", $knev, $vnev, $tel, $mail, $pass,
+                        $verification_code,
+                        $verrification, $kep, $privilage,$currentTime, $verification_time,
                         $banned, $banned_time, $verification_code_pass, $verification_code_expire);
 
                     if ($stmt->execute()) {
@@ -632,7 +689,34 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
         }
 
     }
+    public function errorLogInsert($mail, $errorText, $logType, $logMessage)
+    {
+        global $conn;
 
+        sleep(2);
+
+        $time = time();
+        $currentTime = date("Y-m-d H:i:s", $time);
+
+        $sql = "INSERT INTO errorlog( errorType, errorMail, errorText, errorTime) VALUES (?,?,?,?)";
+        $stmt = $conn->prepare($sql);
+
+        if (!$stmt) {
+            $_SESSION['message'] = 'Error in SQL query: ' . $conn->error;
+        }
+
+        $stmt->bind_param("ssss", $logType, $mail, $errorText, $currentTime);
+
+        if ($stmt->execute()) {
+            $_SESSION['message'] = $logMessage;
+        } else {
+            $_SESSION['message'] = "NUAH.";
+        }
+
+        $stmt->close();
+
+
+    }
     public function passwordCheck($password, $password2, $location)
     {
         if ($password == '') {
@@ -674,6 +758,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             exit();
         }
     }
+
     public function userCheck1($knev, $vnev, $email, $tel2, $location)
     {
         if ($knev == '') {
@@ -716,19 +801,20 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             header('Location: ' . $location);
             exit();
         }
-        if ($tel2 != ""){
+        if ($tel2 != "") {
             if (strlen($tel2) != 7) {
                 $_SESSION['message'] = "A <b>Telefonszám</b> nem létezik";
                 header('Location: ' . $location);
                 exit();
-            }}
-        else{
+            }
+        } else {
             $_SESSION['message'] = "Nincsen kitöltve a <b>Phone Number</b> mező";
             header('Location: ' . $location);
             exit();
         }
 
     }
+
     public function userModifyData($knev, $vnev, $tel2, $location)
     {
 
@@ -752,17 +838,19 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             header('Location: ' . $location);
             exit();
         }
-        if ($tel2 != ""){
+        if ($tel2 != "") {
             if (strlen($tel2) != 7) {
                 $_SESSION['message'] = "A <b>Telefonszám</b> nem létezik";
                 header('Location: ' . $location);
                 exit();
-            }}
+            }
+        }
 
 
     }
 }
 
-$registration = new Functions();
+$functions = new Functions();
+
 
 ?>

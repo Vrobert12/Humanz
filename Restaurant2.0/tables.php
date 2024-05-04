@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
@@ -53,9 +54,9 @@
         <a href="#" class="bar d-block d-lg-none"><h4>R&D</h4><?php /*if (isset($_COOKIE['count']))
              echo $_COOKIE['count'] */ ?></a>
 
-     <?php
-include 'connection.php';
-global $conn;
+        <?php
+        include 'connection.php';
+        global $conn;
         if ($conn) {
 
             if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
@@ -66,11 +67,11 @@ global $conn;
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
                         if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
-            echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
-            echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
+                            echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
+                            echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
 
-            echo '<li><form method="post" action="workers.php"></li>
-            <input type="text" style="width: 200px; height: 30px; " placeholder="search" name="searchMail">
+                            echo '<li><form method="post" action="workers.php"></li>
+            <input type="text" style="width: 200px; height: 30px; " placeholder="search" name="searchName">
               
             <li> <a class="justify-content-end" onclick="activateSearch()"><i class="fa-2x bi bi-search"></i></a></li>
          <li><a class="justify-content-end" onclick="deleteSearch()"><i class="fa-2x bi bi-x-lg"></i></a></li>
@@ -79,10 +80,10 @@ global $conn;
             
         </form>
            <a href="#" class="bar d-block d-lg-none"><h2><i class=" fa-3x bi bi-pc-display-horizontal"></i>  </h2></a>
-            <a href="#" class="bar d-none d-lg-block"> <h2>  Workers</h2></a>';
-            $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-$_SESSION['previousPage']="workers.php";
-            echo "<li><a class=\"justify-content-end\" href=\"registration.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
+            <a href="#" class="bar d-none d-lg-block"> <h2>  Tables</h2></a>';
+                            $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+                            $_SESSION['previousPage']="workers.php";
+                            echo "<li><a class=\"justify-content-end\" href=\"addTable.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
                         }
 
             } else {
@@ -99,8 +100,8 @@ $_SESSION['previousPage']="workers.php";
         } else {
             echo "<a href='login.php'  class='nav-link dropdown-item'><i class=\"bi bi-person\"></i>Connection Error!</a>";
         }
-     ?> <button style="border: none;" class=" fa-1x navbar-toggler ml-auto hidden-sm-up float-xs-right float: right" type="button"
-                data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" >
+        ?> <button style="border: none;" class=" fa-1x navbar-toggler ml-auto hidden-sm-up float-xs-right float: right" type="button"
+                   data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" >
             <?php
             if(isset($_SESSION['profilePic']))
                 echo'  <img class="rounded-circle " width="90" height="90" alt="profilkep" src="http://localhost:/Restaurant2.0/pictures/'. $_SESSION['profilePic'];
@@ -127,7 +128,7 @@ $_SESSION['previousPage']="workers.php";
                             $sql = "SELECT * FROM user";
                             $stmt = $conn->query($sql);
 
-                           echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
+                            echo'<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
                             if ($stmt->num_rows > 0)
 
                                 while ($row = $stmt->fetch_assoc())
@@ -195,7 +196,7 @@ $_SESSION['previousPage']="workers.php";
                     </ul> </nav> </div> </li> </ul> </div> </div> </nav>
 <?php
 if(isset($_SESSION['message']) && $_SESSION['message'] != "")
-echo "<div class='mainBlock rounded bg-dark text-white'><h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
+    echo "<div class='mainBlock rounded bg-dark text-white'><h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
 " . $_SESSION['message'] . "</h1></div>";
 
 $_SESSION['message'] = "";
@@ -204,29 +205,70 @@ $_SESSION['message'] = "";
 </body>
 </html>
 <?php
-include "classUser.php";
-//A session segitsegevel megadjuk az adatok ertekeit
+global $conn;
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+
     if (isset($_POST['searchAction'])) {
         if ($_POST['searchAction'] == 'search') {
-
-            $usersData = new User("Worker",$_POST['searchMail'],"workers.php");
-            $usersData->userString();
-
-        } else {
-
-            $usersData = new User("Worker",0,"workers.php");
-            $usersData->userString();
+            $data = "SELECT * FROM `table` where bookedName= '" . $_POST['searchName'] . "'";
+            users($data);
         }
     } else {
-        $usersData = new User("Worker",0,"workers.php");
-        $usersData->userString();
+        users("SELECT * FROM `table`");
+
     }
-
-
 } else {
     header('Location: index.php');
     exit();
+}
+function users($command)
+{
+
+    global $conn;
+    $sql = $command;
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+
+        echo '<div class="container">
+  <div class="row justify-content-around" >';
+        while ($row = $result->fetch_assoc()) {
+
+            echo ' <div class="col-xl-4 p-4 border bg-dark" style="  
+ margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0">';
+            echo "<label>ID: " . $row['tableId'] . "</label><br>
+<label>Booked Name: " . $row['bookedName'] . "</label><br>
+<label>Capacity: " . $row['capacity'] . "</label><br>
+<label>Reservation Time: " . $row['reservationTime'] . "</label><br>
+<label>Reservation Period: " . $row['period'] . "</label><br>
+<label>Area: " . $row['area'] . "</label><br>
+<label>Smoking: " . $row['smokingArea'] . "</label><br>
+<a href=\"reservation.php?table=" . $row['tableId'] . "\">Reserve</a></div>";
+            /*if($row['verify']==1){
+                echo '<label style="color: green; font-size: 20px">Verified</label><br>';
+            }
+            else
+                echo '<label style="color: red; font-size: 20px">Not verified</label><br>';
+            if ($row['banned'] == 0) {
+                echo "<label style='color: green; font-size: 20px'>Works</label>";
+            } else {
+                echo "<label style='color: red; font-size: 20px'>Blocked</label><br><label> Ban time: " . $row['banned_time'] . "</label><br>";
+            }
+
+
+            echo "<form method='post' action='user.php'>
+<input type='hidden' name='id' value='" . $row['tableId'] . "'>
+<input type='submit' class='more' name='userId' value='Bővebben' >
+</form></div>";*/
+        }
+
+        echo "</div></div>";
+    } else {
+        $_SESSION['message']="<h2>No result.</h2>";
+    }
+
 }
 
 

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Ápr 30. 18:26
+-- Létrehozás ideje: 2024. Máj 04. 17:06
 -- Kiszolgáló verziója: 10.4.32-MariaDB
--- PHP verzió: 8.0.30
+-- PHP verzió: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -86,7 +86,15 @@ INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `er
 (44, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:21:12.000000'),
 (45, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:22:16.000000'),
 (46, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:23:09.000000'),
-(47, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:25:00.000000');
+(47, 'Log in', 'varrorobert03@gmail.com', 'The worker did not set up a password!', '2024-04-28 23:25:00.000000'),
+(48, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-30 19:53:34.000000'),
+(49, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 19:53:45.000000'),
+(50, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:21:13.000000'),
+(51, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:21:25.000000'),
+(52, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:22:05.000000'),
+(53, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:22:07.000000'),
+(54, 'Banned', 'varrorobert03@gmail.com', 'User tried to log in while he is banned!', '2024-04-30 21:25:42.000000'),
+(55, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-30 21:42:30.000000');
 
 -- --------------------------------------------------------
 
@@ -97,10 +105,22 @@ INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `er
 CREATE TABLE `reservation` (
   `tableId` int(11) NOT NULL,
   `registrationId` int(11) NOT NULL,
-  `reservationTime` date NOT NULL,
-  `period` date NOT NULL,
+  `reservationDay` date NOT NULL DEFAULT current_timestamp(),
+  `reservationTime` time NOT NULL,
+  `period` time NOT NULL,
   `reservationCode` int(6) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `reservation`
+--
+
+INSERT INTO `reservation` (`tableId`, `registrationId`, `reservationDay`, `reservationTime`, `period`, `reservationCode`) VALUES
+(1, 6, '2024-05-02', '19:00:00', '21:00:00', 12345),
+(1, 7, '2024-05-02', '21:00:00', '23:00:00', 12345),
+(1, 18, '2024-05-03', '18:00:00', '22:00:00', 0),
+(1, 19, '2024-05-02', '16:00:00', '18:00:00', 12345),
+(1, 24, '2024-05-02', '15:00:00', '16:00:00', 12345);
 
 -- --------------------------------------------------------
 
@@ -110,14 +130,18 @@ CREATE TABLE `reservation` (
 
 CREATE TABLE `table` (
   `tableId` int(6) NOT NULL,
-  `tableCode` int(3) NOT NULL,
   `capacity` int(2) NOT NULL,
-  `reservationTime` datetime NOT NULL,
-  `period` time NOT NULL,
   `area` varchar(50) NOT NULL,
   `smokingArea` tinyint(1) NOT NULL,
   `workerId` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `table`
+--
+
+INSERT INTO `table` (`tableId`, `capacity`, `area`, `smokingArea`, `workerId`) VALUES
+(1, 4, 'Gold', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -126,7 +150,7 @@ CREATE TABLE `table` (
 --
 
 CREATE TABLE `user` (
-  `registrationId` int(6) NOT NULL,
+  `userId` int(6) NOT NULL,
   `firstName` varchar(50) NOT NULL,
   `lastName` varchar(50) NOT NULL,
   `phoneNumber` int(10) NOT NULL,
@@ -134,25 +158,26 @@ CREATE TABLE `user` (
   `userPassword` varchar(60) NOT NULL,
   `profilePic` varchar(100) DEFAULT NULL,
   `privilage` varchar(25) NOT NULL,
+  `registrationTime` timestamp NOT NULL DEFAULT current_timestamp(),
   `verification_code` int(50) DEFAULT NULL,
   `verify` int(11) NOT NULL,
-  `verification_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `verification_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `banned` tinyint(1) NOT NULL,
-  `banned_time` datetime(6) NOT NULL DEFAULT current_timestamp(6),
+  `banned_time` timestamp NOT NULL DEFAULT current_timestamp(),
   `passwordValidation` int(10) NOT NULL,
-  `passwordValidationTime` datetime(6) NOT NULL DEFAULT current_timestamp(6)
+  `passwordValidationTime` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- A tábla adatainak kiíratása `user`
 --
 
-INSERT INTO `user` (`registrationId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
-(6, 'Nikoletta', 'Varro', 0, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 'Guest', 401081, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
-(7, 'Nikoletta', 'Varro', 0, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 'Guest', 102107, 0, '2024-04-20 14:30:12.800889', 0, '2024-04-20 22:59:22.000000', 0, '2024-04-23 11:54:10.723073'),
-(18, 'Dominik', 'Hupko', 0, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 'Worker', 2442334, 1, '2024-04-23 15:31:22.000000', 0, '0000-00-00 00:00:00.000000', 233122, '2024-04-23 15:28:06.000000'),
-(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$BVxOJ0.rmhtkPKjPD3qVWOpu.BYpV5mzlu8Oc9Jki6j3.U2NSZ0xO', '20240428221953.png', 'Admin', 229527, 1, '2024-04-23 22:16:29.000000', 0, '0000-00-00 00:00:00.000000', 168654, '2024-04-28 21:07:45.000000'),
-(21, 'Dominik', 'Varro', 101231232, 'varrorobert03@gmail.com', '$2y$10$YypS3/w1baLb0v00.7zMAeWa0IlqvJzvKurchcImAy4Fn88XRg7em', 'logInPic.png', 'Worker', 4192141, 1, '2024-04-28 23:13:21.000000', 0, '0000-00-00 00:00:00.000000', 206910, '2024-04-28 23:15:44.000000');
+INSERT INTO `user` (`userId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `registrationTime`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
+(6, 'Nikoletta', 'Varro', 0, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 401081, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
+(7, 'Nikoletta', 'Varro', 0, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 102107, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
+(18, 'Dominik', 'Hupko', 0, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 'Worker', '0000-00-00 00:00:00', 2442334, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 233122, '2024-04-23 13:28:06'),
+(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$BVxOJ0.rmhtkPKjPD3qVWOpu.BYpV5mzlu8Oc9Jki6j3.U2NSZ0xO', '20240428221953.png', 'Admin', '0000-00-00 00:00:00', 229527, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 168654, '2024-04-28 19:07:45'),
+(24, 'Dominik', 'Varro', 109420637, 'varrorobert03@gmail.com', '$2y$10$c7SnyQVyr0k88QJotT7PRus7lk1z63wR4ioFtEibmXhCnPILwiEAK', 'logInPic.png', 'Guest', '2024-04-30 19:41:30', 2393321, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -207,7 +232,7 @@ ALTER TABLE `table`
 -- A tábla indexei `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`registrationId`);
+  ADD PRIMARY KEY (`userId`);
 
 --
 -- A tábla indexei `visitor`
@@ -231,19 +256,19 @@ ALTER TABLE `visitorcount`
 -- AUTO_INCREMENT a táblához `errorlog`
 --
 ALTER TABLE `errorlog`
-  MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT a táblához `table`
 --
 ALTER TABLE `table`
-  MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT;
+  MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT a táblához `user`
 --
 ALTER TABLE `user`
-  MODIFY `registrationId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `userId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT a táblához `visitor`
@@ -265,7 +290,7 @@ ALTER TABLE `visitorcount`
 -- Megkötések a táblához `reservation`
 --
 ALTER TABLE `reservation`
-  ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`registrationId`) REFERENCES `user` (`registrationId`),
+  ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`registrationId`) REFERENCES `user` (`userId`),
   ADD CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`tableId`) REFERENCES `table` (`tableId`);
 
 --
