@@ -546,6 +546,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                     $_SESSION['email'] = $row['userMail'];
                     $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
                     $_SESSION['profilePic'] = $row['profilePic'];
+                    $_SESSION['userID'] = $row['userId'];
 
 
                     // Store relevant user information in session variables
