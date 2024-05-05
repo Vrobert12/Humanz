@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 04, 2024 at 05:51 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Gép: 127.0.0.1
+-- Létrehozás ideje: 2024. Máj 05. 20:11
+-- Kiszolgáló verziója: 10.4.32-MariaDB
+-- PHP verzió: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `restaurant`
+-- Adatbázis: `restaurant`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `errorlog`
+-- Tábla szerkezet ehhez a táblához `errorlog`
 --
 
 CREATE TABLE `errorlog` (
@@ -36,7 +36,7 @@ CREATE TABLE `errorlog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `errorlog`
+-- A tábla adatainak kiíratása `errorlog`
 --
 
 INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `errorTime`) VALUES
@@ -94,12 +94,15 @@ INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `er
 (52, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:22:05.000000'),
 (53, 'Log in', 'varrorobert03@gmail.com', 'Wrong password!', '2024-04-30 21:22:07.000000'),
 (54, 'Banned', 'varrorobert03@gmail.com', 'User tried to log in while he is banned!', '2024-04-30 21:25:42.000000'),
-(55, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-30 21:42:30.000000');
+(55, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-04-30 21:42:30.000000'),
+(56, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-05-04 21:26:15.000000'),
+(57, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-05-04 23:54:17.000000'),
+(58, 'Log in', 'robertvarro12@gmail.com', 'Wrong password!', '2024-05-05 18:17:50.000000');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reservation`
+-- Tábla szerkezet ehhez a táblához `reservation`
 --
 
 CREATE TABLE `reservation` (
@@ -112,41 +115,59 @@ CREATE TABLE `reservation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `reservation`
+-- A tábla adatainak kiíratása `reservation`
 --
 
 INSERT INTO `reservation` (`tableId`, `registrationId`, `reservationDay`, `reservationTime`, `period`, `reservationCode`) VALUES
 (1, 6, '2024-05-02', '19:00:00', '21:00:00', 12345),
 (1, 7, '2024-05-02', '21:00:00', '23:00:00', 12345),
 (1, 18, '2024-05-03', '18:00:00', '22:00:00', 0),
-(1, 19, '2024-05-02', '16:00:00', '18:00:00', 12345),
-(1, 24, '2024-05-02', '15:00:00', '16:00:00', 12345);
+(3, 19, '2024-05-16', '16:00:00', '20:15:00', 0),
+(3, 24, '2024-05-15', '17:15:00', '17:45:00', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `table`
+-- Tábla szerkezet ehhez a táblához `table`
 --
 
 CREATE TABLE `table` (
   `tableId` int(6) NOT NULL,
+  `reservationPicture` varchar(100) DEFAULT NULL,
   `capacity` int(2) NOT NULL,
   `area` varchar(50) NOT NULL,
-  `smokingArea` tinyint(1) NOT NULL,
+  `smokingArea` varchar(5) NOT NULL,
   `workerId` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `table`
+-- A tábla adatainak kiíratása `table`
 --
 
-INSERT INTO `table` (`tableId`, `capacity`, `area`, `smokingArea`, `workerId`) VALUES
-(1, 4, 'Gold', 0, 0);
+INSERT INTO `table` (`tableId`, `reservationPicture`, `capacity`, `area`, `smokingArea`, `workerId`) VALUES
+(1, '2.jpg', 4, 'Gold', 'Yes', 0),
+(2, '2.jpg', 4, 'Silver', 'No', 0),
+(3, '2.jpg', 6, 'Gold', 'Yes', 0),
+(4, '2.jpg', 6, 'Gold', 'Yes', 0),
+(5, '2.jpg', 7, 'Gold', 'Yes', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Tábla szerkezet ehhez a táblához `teszt`
+--
+
+CREATE TABLE `teszt` (
+  `adminId` int(11) NOT NULL,
+  `latogatasDatum` int(11) NOT NULL,
+  `Last_Name` int(11) NOT NULL,
+  `date_time` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `user`
 --
 
 CREATE TABLE `user` (
@@ -169,20 +190,20 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `user`
+-- A tábla adatainak kiíratása `user`
 --
 
 INSERT INTO `user` (`userId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `registrationTime`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
 (6, 'Nikoletta', 'Varro', 0, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 401081, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
 (7, 'Nikoletta', 'Varro', 0, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 102107, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
 (18, 'Dominik', 'Hupko', 0, 'hupkodominik143@gmail.com', '$2y$10$TW8FomtNzJoUl0s37W9FYe22K.4m7srELL41rkyfnFqxeVRRyygcO', 'logInPic.png', 'Worker', '0000-00-00 00:00:00', 2442334, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 233122, '2024-04-23 13:28:06'),
-(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$BVxOJ0.rmhtkPKjPD3qVWOpu.BYpV5mzlu8Oc9Jki6j3.U2NSZ0xO', '20240428221953.png', 'Admin', '0000-00-00 00:00:00', 229527, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 168654, '2024-04-28 19:07:45'),
+(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$BVxOJ0.rmhtkPKjPD3qVWOpu.BYpV5mzlu8Oc9Jki6j3.U2NSZ0xO', '20240505171559.jpg', 'Admin', '0000-00-00 00:00:00', 229527, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 168654, '2024-04-28 19:07:45'),
 (24, 'Dominik', 'Varro', 109420637, 'varrorobert03@gmail.com', '$2y$10$c7SnyQVyr0k88QJotT7PRus7lk1z63wR4ioFtEibmXhCnPILwiEAK', 'logInPic.png', 'Guest', '2024-04-30 19:41:30', 2393321, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `visitor`
+-- Tábla szerkezet ehhez a táblához `visitor`
 --
 
 CREATE TABLE `visitor` (
@@ -194,7 +215,7 @@ CREATE TABLE `visitor` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `visitorcount`
+-- Tábla szerkezet ehhez a táblához `visitorcount`
 --
 
 CREATE TABLE `visitorcount` (
@@ -205,96 +226,103 @@ CREATE TABLE `visitorcount` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Indexes for dumped tables
+-- Indexek a kiírt táblákhoz
 --
 
 --
--- Indexes for table `errorlog`
+-- A tábla indexei `errorlog`
 --
 ALTER TABLE `errorlog`
   ADD PRIMARY KEY (`errorLogId`);
 
 --
--- Indexes for table `reservation`
+-- A tábla indexei `reservation`
 --
 ALTER TABLE `reservation`
   ADD PRIMARY KEY (`tableId`,`registrationId`),
   ADD KEY `regisztraloid` (`registrationId`);
 
 --
--- Indexes for table `table`
+-- A tábla indexei `table`
 --
 ALTER TABLE `table`
   ADD PRIMARY KEY (`tableId`,`workerId`),
   ADD KEY `dolgozoId` (`workerId`);
 
 --
--- Indexes for table `user`
+-- A tábla indexei `teszt`
+--
+ALTER TABLE `teszt`
+  ADD UNIQUE KEY `adminId` (`adminId`),
+  ADD UNIQUE KEY `latogatasDatum` (`latogatasDatum`);
+
+--
+-- A tábla indexei `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`userId`);
 
 --
--- Indexes for table `visitor`
+-- A tábla indexei `visitor`
 --
 ALTER TABLE `visitor`
   ADD PRIMARY KEY (`visitorId`,`visitId`),
   ADD KEY `latogatasId` (`visitId`);
 
 --
--- Indexes for table `visitorcount`
+-- A tábla indexei `visitorcount`
 --
 ALTER TABLE `visitorcount`
   ADD PRIMARY KEY (`visitId`,`adminId`),
   ADD KEY `adminId` (`adminId`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT for table `errorlog`
+-- AUTO_INCREMENT a táblához `errorlog`
 --
 ALTER TABLE `errorlog`
-  MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+  MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
--- AUTO_INCREMENT for table `table`
+-- AUTO_INCREMENT a táblához `table`
 --
 ALTER TABLE `table`
-  MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
--- AUTO_INCREMENT for table `user`
+-- AUTO_INCREMENT a táblához `user`
 --
 ALTER TABLE `user`
   MODIFY `userId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- AUTO_INCREMENT for table `visitor`
+-- AUTO_INCREMENT a táblához `visitor`
 --
 ALTER TABLE `visitor`
   MODIFY `visitorId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `visitorcount`
+-- AUTO_INCREMENT a táblához `visitorcount`
 --
 ALTER TABLE `visitorcount`
   MODIFY `visitId` int(6) NOT NULL AUTO_INCREMENT;
 
 --
--- Constraints for dumped tables
+-- Megkötések a kiírt táblákhoz
 --
 
 --
--- Constraints for table `reservation`
+-- Megkötések a táblához `reservation`
 --
 ALTER TABLE `reservation`
   ADD CONSTRAINT `reservation_ibfk_1` FOREIGN KEY (`registrationId`) REFERENCES `user` (`userId`),
   ADD CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`tableId`) REFERENCES `table` (`tableId`);
 
 --
--- Constraints for table `visitor`
+-- Megkötések a táblához `visitor`
 --
 ALTER TABLE `visitor`
   ADD CONSTRAINT `visitor_ibfk_1` FOREIGN KEY (`visitId`) REFERENCES `visitorcount` (`visitId`);
