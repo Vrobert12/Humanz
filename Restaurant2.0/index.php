@@ -63,6 +63,7 @@ if (isset($_COOKIE['count'])) {
         <a href="#" class="bar d-block d-lg-none"><h4>R&D</h4><?php /*if (isset($_COOKIE['count']))
              echo $_COOKIE['count'] */ ?></a>
 
+
         <?php
 
         if ($conn) {
@@ -70,16 +71,16 @@ if (isset($_COOKIE['count'])) {
             if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);
-
+                echo'  <li><a class="d-block d-lg-none " href="tables.php"><i class="fa-2x bi bi-list-task"></i></a></li>
+        <li><a class="d-none d-lg-block " href="tables.php"><i class="fa-2x bi bi-list-task"></i> Tables</a></li>';
                 $_SESSION['message'] = "";
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
+
                         if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
-                            echo "<li><a class=\"d-block d-lg-none \" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i></a></li>";
-                            echo "<li><a class=\"d-block d-lg-none \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i></a></li>";
+                           echo "<li><a class=\"d-block d-lg-none \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i></a></li>";
                             echo "<li><a class=\"d-block d-lg-none \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i></a></li>";
 
-                            echo "<li><a class=\"d-none d-lg-block \" href=\"reservation.php\"><i class=\"fa-2x bi bi-list-task\"></i> Tables</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i> Users</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i> Workers</a></li>";
                         }
@@ -137,10 +138,10 @@ if (isset($_COOKIE['count'])) {
                                     }
 
                                 echo "<li><a class=\" d-block d-lg-none \"  onclick=' activateProfilePicture()'>
-                                <i class=\"fa-2x bi bi-person\"></i> Set Profile Picture";
+                                <i class=\"fa-2x bi bi-person\"></i> Set Profile Picture</a>";
 
 
-                                echo "</a><form method='post' action='functions.php' enctype='multipart/form-data'>";
+                                echo "<form method='post' action='functions.php' enctype='multipart/form-data'>";
                                 $_SESSION['backPic'] = "index.php";
                                 echo "<input class=\" dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
                                 //láthatatlan, viszont kell a profilkép feltöltéshez

@@ -89,7 +89,7 @@ src=\"http://localhost:/Restaurant2.0/pictures/" . $row['profilePic'] . "
         }
     }
 }
-echo"</div></div></div>";
+echo"</div></div>";
 
 ?>
 <script>

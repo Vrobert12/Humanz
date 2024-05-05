@@ -33,8 +33,9 @@ class Functions
                     $this->logOut();
                     break;
                 case 'picture':
-                    $this->picture();
+                    $this->picture("index.php");
                     break;
+
                 case 'ResetPass':
                     $this->resetPassword();
                     break;
@@ -48,12 +49,13 @@ class Functions
                     $this->addWorker();
                     break;
 
-                case 'BanPerson':case 'UnBanPerson':
+                case 'BanPerson':
+                case 'UnBanPerson':
                     $this->ban();
                     break;
                 case 'AddTable':
-                $this->addTable();
-                break;
+                    $this->addTable();
+                    break;
                 default:
                     $_SESSION['message'] = "Something went wrong in switch";
                     header('Location:users.php');
@@ -71,72 +73,101 @@ class Functions
             }
         }
     }
+
     public function addTable()
     {
+
         if (isset($_POST['cap']) && isset($_POST['ar'])) {
             global $conn;
             $cap = $_POST['cap'];
             $ar = $_POST['ar'];
-            if(!empty($_POST['sm']))
-            {
+            $picture = $this->picture();
+            if (isset($_POST['sm'])) {
                 $sm = "Yes";
+            } else $sm = "No";
+            if (empty($_FILES['picture']['name'])) {
+                $_SESSION['message'] = "You must add a picture";
+                header('Location:addTable.php');
+                exit();
             }
-            else $sm = "No";
+
+            if ($ar == '') {
+                $_SESSION['message'] = "The Areas name must contain data";
+                header('Location:addTable.php');
+                exit();
+            }
+            if ($cap == '') {
+                $_SESSION['message'] = "The number of capacity must contain data";
+                header('Location:addTable.php');
+                exit();
+            }
+            if (!is_numeric($cap)) {
+                $_SESSION['message'] = "The number of capacity must be a number";
+                header('Location:addTable.php');
+                exit();
+            }
+            if (is_numeric($ar)) {
+                $_SESSION['message'] = "The Area can not contain number";
+                header('Location:addTable.php');
+                exit();
+            }
             //$this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=".$_SESSION['token']);
             try {
                 // SMTP settings
                 // Insert user data into the database
-                $sql = "INSERT INTO `table` (capacity, area, smokingArea) VALUES (?,?,?)";
+
+
+                $sql = "INSERT INTO `table` (capacity, area, reservationPicture,smokingArea) VALUES (?,?,?,?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("iss", $cap, $ar, $sm);
+                $stmt->bind_param("isss", $cap, $ar, $picture, $sm);
                 if ($stmt->execute()) {
+
                     $_SESSION['message'] = "Table added successfully!";
                     $_SESSION['text'] = "<h2>Add table</h2>";
                     header('Location: tables.php');
                     exit(); // Exit script after redirection
                 } else {
                     $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
-                    header('Location: addTable.php?token='.$_SESSION['token']);
+                    header('Location: addTable.php?token=' . $_SESSION['token']);
                     exit();
                 }
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 $_SESSION['message'] = "An error occurred: " . $e->getMessage();
             }
         }
     }
-public function ban()
-{
-    if(isset($_POST['ban'])){
-        try {
-            global $conn;
-            $time = time();
-            $currentTime = date("Y-m-d H:i:s", $time);
-            if ($_POST['ban'] == "yes") {
-                $sql = mysqli_prepare($conn, "UPDATE user SET banned=0,banned_time=0 WHERE userId=?");
-                $_SESSION['message'] = "The person is unbanned";
-                $sql->bind_param("i", $_POST['id']);
-            } else {
-                $sql = mysqli_prepare($conn, "UPDATE user SET banned=1,banned_time=? WHERE userId=?");
-                $_SESSION['message'] = "The person is banned";
 
-                $sql->bind_param("si", $currentTime, $_POST['id']);
+    public function ban()
+    {
+        if (isset($_POST['ban'])) {
+            try {
+                global $conn;
+                $time = time();
+                $currentTime = date("Y-m-d H:i:s", $time);
+                if ($_POST['ban'] == "yes") {
+                    $sql = mysqli_prepare($conn, "UPDATE user SET banned=0,banned_time=0 WHERE userId=?");
+                    $_SESSION['message'] = "The person is unbanned";
+                    $sql->bind_param("i", $_POST['id']);
+                } else {
+                    $sql = mysqli_prepare($conn, "UPDATE user SET banned=1,banned_time=? WHERE userId=?");
+                    $_SESSION['message'] = "The person is banned";
+
+                    $sql->bind_param("si", $currentTime, $_POST['id']);
+                }
+
+                $sql->execute();
+
+                header('Location:' . $_SESSION['previousPage']);
+                $_SESSION['previousPage'] = "";
+                exit();
+            } catch (Exception $e) {
+                $_SESSION['message'] = "Something went wrong";
+                header('Location:' . $_SESSION['previousPage']);
+                $_SESSION['previousPage'] = "";
+                exit();
             }
-
-            $sql->execute();
-
-            header('Location:'.$_SESSION['previousPage']);
-            $_SESSION['previousPage'] = "";
-            exit();
-        }
-        catch (Exception $e) {
-            $_SESSION['message'] = "Something went wrong";
-            header('Location:'.$_SESSION['previousPage']);
-            $_SESSION['previousPage'] = "";
-            exit();
         }
     }
-}
 
     public function addWorker()
     {
@@ -394,11 +425,11 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
         }
     }
 
-    public function picture()
+    public function picture($target = " ")
     {
         global $conn;
         if (isset($_FILES['picture'])) {
-            $target_dir = "C:/xampp/htdocs/Restaurant2.0/Restaurant/pictures/";
+            $target_dir = "C:/xampp/htdocs/Restaurant2.0/pictures/";
             $target_file = $target_dir . basename($_FILES["picture"]["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -406,7 +437,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             $kep_dir = $imageFileType;
             $kep = $kep . "." . $kep_dir;
             if ($_FILES['picture']["error"] > 0) {
-                echo "Something went wrong during file upload!";
+                return $_FILES["picture"]["error"];
             } else {
                 if (is_uploaded_file($_FILES['picture']['tmp_name'])) {
 
@@ -427,13 +458,13 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
                     if (!exif_imagetype($file_temp)) {
                         $_SESSION['message'] = "File is not a picture!";
-                        header('location:  index.php');
+                        header('location: ' . $target);
                         exit();
                     }
                     $file_size = $file_size / 1024;
                     if ($file_size > 200) {
                         $_SESSION['message'] = "File is to big!";
-                        header('location:  index.php');
+                        header('location: ' . $target);
                         exit();
                     }
 
@@ -478,19 +509,23 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
 
                 // Assuming 'profilkep' is a column in your table
+                if ($target == "index.php") {
+
+                    $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
+                    $query->bind_param("ss", $new_file_name, $_SESSION['email']);
+                    $query->execute();
+                    $_SESSION['profilePic'] = $new_file_name;
+                    // Redirect to login page after successful upload
 
 
-                $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
-                $query->bind_param("ss", $new_file_name, $_SESSION['email']);
-                $query->execute();
-                $_SESSION['profilePic'] = $new_file_name;
-                // Redirect to login page after successful upload
-
-
-                header('Location: ' . $_SESSION['backPic']);
-                exit(); // Exit after redirection
+                    header('Location: ' . $_SESSION['backPic']);
+                    exit(); // Exit after redirection
+                } else {
+                    return $new_file_name;
+                }
             }
         }
+        return "no";
     }
 
     public function logOut()
@@ -607,7 +642,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             try {
                 // SMTP settings
                 $time = time();
-                $verifyTime=time() + 60 * 10;
+                $verifyTime = time() + 60 * 10;
                 $verification_time = date("Y-m-d H:i:s", $verifyTime);
                 $currentTime = date("Y-m-d H:i:s", $time);
 
@@ -667,7 +702,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
                     $verrification = 0; // Placeholder for verification_code
                     $stmt->bind_param("ssissiissssisss", $knev, $vnev, $tel, $mail, $pass,
                         $verification_code,
-                        $verrification, $kep, $privilage,$currentTime, $verification_time,
+                        $verrification, $kep, $privilage, $currentTime, $verification_time,
                         $banned, $banned_time, $verification_code_pass, $verification_code_expire);
 
                     if ($stmt->execute()) {
@@ -690,6 +725,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
         }
 
     }
+
     public function errorLogInsert($mail, $errorText, $logType, $logMessage)
     {
         global $conn;
@@ -718,6 +754,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
 
 
     }
+
     public function passwordCheck($password, $password2, $location)
     {
         if ($password == '') {

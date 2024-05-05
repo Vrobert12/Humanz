@@ -63,24 +63,23 @@
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);
 
-
-                if ($stmt->num_rows > 0)
-                    while ($row = $stmt->fetch_assoc())
-                        if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
-                            echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
-                            echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
-
-                            echo '<li><form method="post" action="workers.php"></li>
+                echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
+                echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
+                echo '<li><form method="post" action="tables.php"></li>
             <input type="text" style="width: 200px; height: 30px; " placeholder="search" name="searchName">
               
             <li> <a class="justify-content-end" onclick="activateSearch()"><i class="fa-2x bi bi-search"></i></a></li>
          <li><a class="justify-content-end" onclick="deleteSearch()"><i class="fa-2x bi bi-x-lg"></i></a></li>
             <input type="submit" value="search" id="searchAction" name="searchAction" style="display: none">
-            <input type="submit" value="delete" id="searchDelete" name="searchDelete" style="display: none">
-            
-        </form>
+            <input type="submit" value="delete" id="searchDelete" name="searchDelete" style="display: none"></form>';
+                echo ' 
            <a href="#" class="bar d-block d-lg-none"><h2><i class=" fa-3x bi bi-pc-display-horizontal"></i>  </h2></a>
             <a href="#" class="bar d-none d-lg-block"> <h2>  Tables</h2></a>';
+                if ($stmt->num_rows > 0)
+                    while ($row = $stmt->fetch_assoc())
+
+                if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
+
                             $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
                             $_SESSION['previousPage']="workers.php";
                             echo "<li><a class=\"justify-content-end\" href=\"addTable.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
@@ -187,13 +186,7 @@
                     ?>
 
 
-                    <ul class="dropdown-menu dropdown-menu-end justify-content-end" aria-labelledby="dropdownMenuLink">
-                        <li><a class="ml-auto hidden-sm-up" href="reservation.php"><i class="bi bi-list-task"></i> </a></li>
-                        <li><a class="ml-auto hidden-sm-up" href="users.php"><i class="bi bi-people"></i></a></li>
-                        <li><a class="ml-auto hidden-sm-up" href="workers.php"><i class="bi bi-person-workspace"></i> </a></li>
-
-
-                    </ul> </nav> </div> </li> </ul> </div> </div> </nav>
+                   </nav> </div> </li> </ul> </div> </div> </nav>
 <?php
 if(isset($_SESSION['message']) && $_SESSION['message'] != "")
     echo "<div class='mainBlock rounded bg-dark text-white'><h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
@@ -208,6 +201,7 @@ $_SESSION['message'] = "";
 global $conn;
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
 
+    $_SESSION['backPic']="tables.php";
     if (isset($_POST['searchAction'])) {
         if ($_POST['searchAction'] == 'search') {
             $data = "SELECT * FROM `table` where bookedName= '" . $_POST['searchName'] . "'";
@@ -232,17 +226,17 @@ function users($command)
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
 
-        echo '<div class="container">
+        echo'<div class="container">
   <div class="row justify-content-around" >';
         while ($row = $result->fetch_assoc()) {
 
-            echo ' <div class="col-xl-4 p-4 border bg-dark" style="  
- margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0">';
-            echo "<label>ID: " . $row['tableId'] . "</label><br>
-<label>Booked Name: " . $row['bookedName'] . "</label><br>
+            echo ' <div class="col-xl-4 p-5 border bg-dark" style="  
+ margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
+            echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" 
+src=\"http://localhost:/Restaurant2.0/pictures/" . $row['reservationPicture'] . "
+          \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><label>ID: " . $row['tableId'] . "</label><br>
 <label>Capacity: " . $row['capacity'] . "</label><br>
-<label>Reservation Time: " . $row['reservationTime'] . "</label><br>
-<label>Reservation Period: " . $row['period'] . "</label><br>
+
 <label>Area: " . $row['area'] . "</label><br>
 <label>Smoking: " . $row['smokingArea'] . "</label><br>
 <a href=\"reservation.php?table=" . $row['tableId'] . "\">Reserve</a></div>";
