@@ -202,6 +202,14 @@ if (isset($_SESSION['message']) && $_SESSION['message'] != "")
 <h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
 " . $_SESSION['message'] . "</h1></div>";
 $_SESSION['message'] = "";
+
+echo ' <div class="col-xl-4 p-5 border bg-dark" style="
+ margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
+echo '<p style="color: #ffffff">Welcome to R&D website
+
+R&D is a newly founded restaurant. On our website, you can make reservations for our restaurant at ease from the comfort of your home. And once you arrive at R&D our assigned worker will greet you and preprare your reserved table for you.
+                                                                                                                                                                                                                                         Making a reservation is very simple. First off you need to register for an account, once thats done click on the "Tables" option next to our logo in the top-left corner, then you will see all the avalible tables, click the "reserve" button on the desired table.</p>'
+
 ?>
 </body>
 </html>
