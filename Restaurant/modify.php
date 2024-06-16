@@ -8,10 +8,10 @@
 </head>
 <body>
 <form method="post" action="functions.php" class="mainForm">
-
+    <a class="nextPage" href="index.php">Back</a><br><br>
     <input type="hidden" placeholder="Emailcím" name="mail" class="inputok" id="mail" value="<?php
     if(isset($_SESSION['email'])){echo $_SESSION['email'];}
-    ?>"><br>
+    ?>">
     <label for="knev">Keresztnev:</label><br>
     <input type="text" class="inputok" placeholder="Keresztnév" name="firstName" id="knev"><br>
     <label for="vnev">Vezeteknev:</label><br>

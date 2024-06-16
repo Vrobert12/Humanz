@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>MainPage</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -12,47 +12,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
-    <script>
-        function activateProfilePicture() {
-            // Trigger click event on the file input element
-            document.getElementById('pictureInput').click();
-        }
-
-
-        function activateSubmit() {
-            // Activate the submit button when a file is selected
-            document.getElementById('submitButton').click();
-        }
-
-        function logoutAndRedirect() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'functions.php', true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // Redirect to MainPage.php after successful logout
-                    window.location.href = 'index.php';
-                } else {
-                    // Handle logout error
-                    console.error('Logout failed with status ' + xhr.status);
-                }
-            };
-            xhr.send();
-        }
-    </script>
+    <script src="LogOut.js"></script>
+    <script src="indexJS.js"></script>
 </head>
 <?php
 include 'connection.php';
+include("cookie.php");
 global $conn;
-$cookie = 1;
 
-if (isset($_COOKIE['count'])) {
-    if ($_COOKIE['count'] < 2) {
-        $cookie = ++$_COOKIE['count'];
-        setcookie("count", $cookie);
-    }
-} else {
-    setcookie("count", $cookie, time() + 5 * 60);
-}
 ?>
 <body>
 <nav class="navbar navbar-expand-lg bg-black navbar-nav ml-auto">
@@ -73,7 +40,7 @@ if (isset($_COOKIE['count'])) {
                 $stmt = $conn->query($sql);
                 echo '  <li><a class="d-block d-lg-none " href="tables.php"><i class="fa-2x bi bi-list-task"></i></a></li>
         <li><a class="d-none d-lg-block " href="tables.php"><i class="fa-2x bi bi-list-task"></i> Tables</a></li>';
-                $_SESSION['message'] = "";
+
                 if ($stmt->num_rows > 0) {
                     while ($row = $stmt->fetch_assoc()) {
 
@@ -84,6 +51,7 @@ if (isset($_COOKIE['count'])) {
 
                             echo "<li><a class=\"d-none d-lg-block \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i> Users</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i> Workers</a></li>";
+                            require 'counter.php';
                         } elseif ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Worker") {
                             $_SESSION['privalage'] = "worker";
                             echo "<li><a class=\"d-block d-lg-none \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i></a></li>";
@@ -112,7 +80,7 @@ if (isset($_COOKIE['count'])) {
                 data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
             <?php
             if (isset($_SESSION['profilePic']))
-                echo '  <img class="rounded-circle " width="40" height="40" alt="profilkep" src="http://localhost:/Restaurant/pictures/' . $_SESSION['profilePic'];
+                echo '  <img class="rounded-circle " width="100" height="100" alt="profilkep" src="https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/' . $_SESSION['profilePic'];
             ?>">
 
         </button>
@@ -135,7 +103,7 @@ if (isset($_COOKIE['count'])) {
                             $sql = "SELECT * FROM user";
                             $stmt = $conn->query($sql);
 
-                            $_SESSION['message'] = "";
+
                             echo '<div class=" collapse navbar-collapse justify-content-end" id="collapsibleNavbar">';
                             if ($stmt->num_rows > 0)
 
@@ -144,7 +112,7 @@ if (isset($_COOKIE['count'])) {
 
 
                                         echo "<li><a class='bar d-none d-lg-block'> <i class=\"fa-2x bi bi-person\"></i> $name</a></li>";
-
+$_SESSION['name']=$name;
                                     }
 
                             echo "<li><a class=\" d-block d-lg-none \"  onclick=' activateProfilePicture()'>
@@ -162,12 +130,15 @@ if (isset($_COOKIE['count'])) {
                             echo "<li><a class=\"  d-block d-lg-none\" href=\"modify.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
                             echo "<i class='fa-2x  bi bi-person-fill-gear'></i></i> Modify User</a></li>";
                             $_SESSION['action'] = "kijelentkezes";
-                            echo "<li><a class=\"  d-block d-lg-none \" href=\"functions.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
-                            echo "<i class=\"bi bi-door-open fa-2x justify-content-end\"></i> Log out</a></li>";
+
+                            echo "<li><a  class=\" d-block d-lg-none \" href=\"functions.php\" onclick=\"confirmLogout(event)\">";
+                            echo'  <i class="bi bi-door-open fa-2x justify-content-end"></i> Log out</a></li>';
+
 
 
                             echo "<li><a class=\" d-none d-lg-block \"  onclick=' activateProfilePicture()'>
-<img  class=\"profilePic\" src=\"http://localhost:/Restaurant/pictures/{$profilePic}\" width=\"45\" height=\"45\" alt=\"profilkep\">";
+                            <img class=\"profilePic\" src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/{$profilePic}\"
+                             width=\"45\" height=\"45\" alt=\"profilkep\">";
 
 
                             echo "</a><form method='post' action='functions.php' enctype='multipart/form-data'>";
@@ -181,7 +152,7 @@ if (isset($_COOKIE['count'])) {
                             echo "<li><a  class=\" d-none d-lg-block \" href=\"modify.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
                             echo "<i class='fa-2x  bi bi-person-fill-gear'></i></i> </a></li>";
                             $_SESSION['action'] = "kijelentkezes";
-                            echo "<li><a  class=\" d-none d-lg-block \" href=\"functions.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
+                            echo "<li><a  class=\" d-none d-lg-block \" href=\"functions.php\" onclick=\"confirmLogout(event)\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
                             echo "<i class=\"bi bi-door-open fa-2x\"></i></a></li>";
 
                             echo "</div>";
@@ -202,13 +173,14 @@ if (isset($_SESSION['message']) && $_SESSION['message'] != "")
 <h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
 " . $_SESSION['message'] . "</h1></div>";
 $_SESSION['message'] = "";
-
 echo ' <div class="col-xl-4 p-5 border bg-dark" style="
- margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
+ margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: 80%" >';
 echo '<p style="color: #ffffff">Welcome to R&D website
-
-R&D is a newly founded restaurant. On our website, you can make reservations for our restaurant at ease from the comfort of your home. And once you arrive at R&D our assigned worker will greet you and preprare your reserved table for you.
-                                                                                                                                                                                                                                         Making a reservation is very simple. First off you need to register for an account, once thats done click on the "Tables" option next to our logo in the top-left corner, then you will see all the avalible tables, click the "reserve" button on the desired table.</p>'
+ is a newly founded restaurant. On our website, you can make reservations for our restaurant at ease from the 
+comfort of your home. And once you arrive at R&D our assigned worker will greet you and prepare your
+ reserved table for you. Making a reservation is very simple. First off you need to register for an account,
+  once that is done click on the "Tables" option next to our logo in the top-left corner, then you will see all the 
+  available tables, click the "reserve" button on the desired table.</p></div>'
 
 ?>
 </body>

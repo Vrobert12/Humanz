@@ -5,15 +5,37 @@ body{
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+.nextPage {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    background-color:white;
+    border: 2px solid #000000;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+    font-size: 20px;
+    padding: 10px;
+    margin: 10px;
+}
 
+.nextPage:hover {
+    background-color: #668d9a;
+    color: navy;
+}
 .inputok{
+    transition: background-color 0.3s ease;
     border-radius: 10px;
     font-size: 20px;
     padding: 10px;
     margin: 10px;
 
     text-align: center;}
-.mainForm{
+.inputok:hover {
+    background-color: #d5f6f0;
+    color: green;
+    border-color: #333;
+}
+.mainForm,.reservationForm{
     -webkit-animation: fadeIn 1s;
     padding-top: 50px;
     padding-bottom: 30px;
@@ -26,6 +48,9 @@ body{
     left: 0;
     background-color: #b4ddd3;
     border-radius: 10px;
+}
+.reservationForm{
+    width:650px ;
 }
 label{
     margin-top: 100px;

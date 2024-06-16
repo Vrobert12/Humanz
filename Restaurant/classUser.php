@@ -50,14 +50,14 @@ else{
                 echo ' <div class="col-xl-4 p-3 border bg-dark" style="  
  margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
                 echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" 
-src=\"http://localhost:/Restaurant/pictures/" . $row['profilePic'] . "
+src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/" . $row['profilePic'] . "
           \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><label>ID: " . $row['userId'] . "</label><br>
           
-<label>Keresztnév: " . $row['firstName'] . "</label><br>
-<label>Vezetéknév: " . $row['lastName'] . "</label><br>
-<label>Telefonszam: " . $row['phoneNumber'] . "</label><br>
+<label>First Name: " . $row['firstName'] . "</label><br>
+<label>Last Name: " . $row['lastName'] . "</label><br>
+<label>Phone Number: " . $row['phoneNumber'] . "</label><br>
 
-<label>Email cím: " . $row['userMail'] . "</label><br>";
+<label>E-mail Address: " . $row['userMail'] . "</label><br>";
                 $_SESSION['chosenName']= $row['firstName']." ".$row['lastName'];
                 if ($row['verify'] == 1) {
                     echo '<label style="color: green; font-size: 20px">Verified</label><br>';

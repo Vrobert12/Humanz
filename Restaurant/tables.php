@@ -9,41 +9,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous"></script>
-    <script>
-        function activateProfilePicture() {
-            // Trigger click event on the file input element
-            document.getElementById('pictureInput').click();
-        }
+    <script src="LogOut.js"></script>
+    <script src="Users.js"></script>
+<style>
+    label, a {
+        font-size: 24px;
+    }
 
-
-        function activateSubmit() {
-            // Activate the submit button when a file is selected
-            document.getElementById('submitButton').click();
+    @media (max-width: 1000px) {
+        label, a {
+            font-size: 48px;
         }
-        function activateSearch() {
-            // Activate the submit button when a file is selected
-            document.getElementById('searchAction').click();
-        }
-        function deleteSearch() {
-            // Activate the submit button when a file is selected
-            document.getElementById('searchDelete').click();
-        }
-        function logoutAndRedirect() {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'functions.php', true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // Redirect to MainPage.php after successful logout
-                    window.location.href = 'index.php';
-                } else {
-                    // Handle logout error
-                    console.error('Logout failed with status ' + xhr.status);
-                }
-            };
-            xhr.send();
-        }
-    </script>
-
+    }
+</style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-black navbar-nav ml-auto">
@@ -66,7 +44,7 @@
                 echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
                 echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
                 echo '<li><form method="post" action="tables.php"></li>
-            <input type="text" style="width: 200px; height: 30px; " placeholder="search" name="searchName">
+            <input type="text" style="width: 300px; font-size: 30px; height: 50px; " placeholder="search" name="searchName">
               
             <li> <a class="justify-content-end" onclick="activateSearch()"><i class="fa-2x bi bi-search"></i></a></li>
          <li><a class="justify-content-end" onclick="deleteSearch()"><i class="fa-2x bi bi-x-lg"></i></a></li>
@@ -103,7 +81,7 @@
                    data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar" >
             <?php
             if(isset($_SESSION['profilePic']))
-                echo'  <img class="rounded-circle " width="90" height="90" alt="profilkep" src="http://localhost:/Restaurant/pictures/'. $_SESSION['profilePic'];
+                echo'  <img class="rounded-circle " width="100" height="100" alt="profilkep" src="https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/'. $_SESSION['profilePic'];
             ?>">
 
         </button>
@@ -153,12 +131,12 @@
                             echo "<li><a class=\"  d-block d-lg-none\" href=\"modify.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
                             echo "<i class='fa-2x  bi bi-person-fill-gear'></i></i> Modify User</a></li>";
                             $_SESSION['action'] = "kijelentkezes";
-                            echo "<li><a class=\"  d-block d-lg-none \" href=\"functions.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
+                            echo "<li><a  class=\" d-block d-lg-none \" href=\"functions.php\" onclick=\"confirmLogout(event)\">";
                             echo "<i class=\"bi bi-door-open fa-2x justify-content-end\"></i> Log out</a></li>";
 
 
                             echo "<li><a class=\" d-none d-lg-block \"  onclick=' activateProfilePicture()'>
-<img  class=\"profilePic\" src=\"http://localhost:/Restaurant/pictures/{$profilePic}\" width=\"45\" height=\"45\" alt=\"profilkep\">";
+<img  class=\"profilePic\" src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/{$profilePic}\" width=\"45\" height=\"45\" alt=\"profilkep\">";
 
 
                             echo "</a><form method='post' action='functions.php' enctype='multipart/form-data'>";
@@ -172,7 +150,7 @@
                             echo "<li><a  class=\" d-none d-lg-block \" href=\"modify.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
                             echo "<i class='fa-2x  bi bi-person-fill-gear'></i></i> </a></li>";
                             $_SESSION['action'] = "kijelentkezes";
-                            echo "<li><a  class=\" d-none d-lg-block \" href=\"functions.php\">"; // a headeren keresztül megadjuk a kijeletkezés értékét
+                            echo "<li><a  class=\" d-none d-lg-block \" href=\"functions.php\" onclick=\"confirmLogout(event)\">";
                             echo "<i class=\"bi bi-door-open fa-2x\"></i></a></li>";
 
                             echo "</div>";
@@ -189,8 +167,17 @@
                    </nav> </div> </li> </ul> </div> </div> </nav>
 <?php
 if(isset($_SESSION['message']) && $_SESSION['message'] != "")
-    echo "<div class='mainBlock rounded bg-dark text-white'><h1 style=' text-align: center; top:100px; margin: auto; left: 0; right: 0'>
-" . $_SESSION['message'] . "</h1></div>";
+    echo "<div class='mainBlock rounded bg-dark text-white' style='text-align: center; margin-top: 100px;'>
+          <h1 style='margin: auto;'>
+              " . $_SESSION['message'] . "
+          </h1>
+          <a class='inputok' onclick='refreshPage()' style='display: inline-block; padding: 10px 20px; 
+             background-color: #19451e; color: white; text-decoration: none; border-radius: 5px; 
+             cursor: pointer; transition: background-color 0.3s ease; margin-top: 20px;'>
+              Okay
+          </a>
+      </div>";
+
 
 $_SESSION['message'] = "";
 ?>
@@ -200,28 +187,29 @@ $_SESSION['message'] = "";
 <?php
 global $conn;
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+    // Set a session variable for returning to tables.php
+    $_SESSION['backPic'] = "tables.php";
 
+    if (isset($_POST['searchAction']) && $_POST['searchAction'] == 'search') {
+        $tableLike = "%" . $_POST['searchName'] . "%";
+        users("SELECT * FROM `table` WHERE area LIKE ?", $tableLike);
 
-    $_SESSION['backPic']="tables.php";
-    if (isset($_POST['searchAction'])) {
-        if ($_POST['searchAction'] == 'search') {
-            $data = "SELECT * FROM `table` where 	tableId = '" . $_POST['searchName'] . "'";
-            users($data);
-        }
     } else {
         users("SELECT * FROM `table`");
-
     }
 } else {
+    // Redirect to index.php if session variables are not set
     header('Location: index.php');
     exit();
 }
-function users($command)
+function users($command,$param = null)
 {
     $_SESSION['reservation']=0;
     global $conn;
-    $sql = $command;
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare($command);
+    if ($param) {
+        $stmt->bind_param("s", $param);
+    }
     $stmt->execute();
 
     $result = $stmt->get_result();
@@ -234,13 +222,18 @@ function users($command)
             echo ' <div class="col-xl-4 p-5 border bg-dark" style="  
  margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
             echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" 
-src=\"http://localhost:/Restaurant/pictures/" . $row['reservationPicture'] . "
+src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/" . $row['reservationPicture'] . "
           \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><label>ID: " . $row['tableId'] . "</label><br>
 <label>Capacity: " . $row['capacity'] . "</label><br>
 
 <label>Area: " . $row['area'] . "</label><br>
 <label>Smoking: " . $row['smokingArea'] . "</label><br>
-<a href=\"reservation.php?table=" . $row['tableId'] . "\">Reserve</a></div>";
+<a href=\"reservation.php?table=" . $row['tableId'] . "\">Reserve</a>&nbsp&nbsp&nbsp";
+            if( $_SESSION['privalage']=='admin')
+echo"<a href=\"modifyTable.php?table=" . $row['tableId'] . "\">Modify</a>";
+
+                echo"</div>";
+
             /*if($row['verify']==1){
                 echo '<label style="color: green; font-size: 20px">Verified</label><br>';
             }

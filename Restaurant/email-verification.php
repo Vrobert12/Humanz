@@ -34,7 +34,7 @@ if (isset($_POST['verify_email']) && isset($_SESSION['mailReset'])) {
                     exit();
 
                 } else {
-                    $_SESSION['message'] = "Ez a kód nem érvényes az oldalunkon.";
+                    $_SESSION['message'] = "This code is not valid on our page.";
                 }
             }
         }
@@ -62,8 +62,7 @@ if (isset($_POST['verify_email']) && isset($_SESSION['email'])) {
                 $query = mysqli_prepare($conn, "UPDATE user SET verification_code = ? ,verification_time =? WHERE userMail = ?");
                 $query->bind_param("sss", $verification_code, $verification_time, $mail);
                 $query->execute();
-                $_SESSION['message'] = "Ez a kód lejárt az oldalunkon, ha ön szerint regisztrálva<br> van az email címe nézze meg hogy 
-                kapott-e egy érvényes verifikációs kódot.";
+                $_SESSION['message'] = "This code is not valid on our page.<br> If you are registered than we sent you email with new code.";
                 $_SESSION['verification_code'] = $verification_code;
                 sleep(2);
 
@@ -90,7 +89,7 @@ if (isset($_POST['verify_email']) && isset($_SESSION['email'])) {
 
                     if ($stmt->execute()) {
                         sleep(2);
-                        $_SESSION['message'] = "Most már be bír jelentkezni";
+                        $_SESSION['message'] = "Now you may log in";
                         header('Location: logIn.php');
 
                         exit();
@@ -101,7 +100,7 @@ if (isset($_POST['verify_email']) && isset($_SESSION['email'])) {
 
                 } else {
                     sleep(2);
-                    $_SESSION['message'] = "Ez a kód nem érvényes az oldalunkon.";
+                    $_SESSION['message'] = "This code is not valid on our page.";
                     $mail = $_SESSION['email'];
                     $logType = "E-mail validation";
                     $errorText = "The validation code is not correct!";
@@ -144,9 +143,7 @@ function errorLogInsert($logType, $mail, $errorText, $logMessage)
 
 }
 
-if (isset($_SESSION['message'])) {
-    echo "<b>" . $_SESSION['message'] . "</b>";
-}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

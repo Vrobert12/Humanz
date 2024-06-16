@@ -23,10 +23,10 @@ class Functions
         if (isset($_POST['action'])) {
 
             switch ($_POST['action']) {
-                case 'regisztracio':
+                case 'registration':
                     $this->registration();
                     break;
-                case 'Bejelentkezes':
+                case 'Log in':
                     $this->login();
                     break;
                 case 'kijelentkezes':
@@ -48,7 +48,9 @@ class Functions
                 case 'AddWorker':
                     $this->addWorker();
                     break;
-
+                case 'ModifyTable':
+                    $this->modifyTable();
+                    break;
                 case 'BanPerson':
                 case 'UnBanPerson':
                     $this->ban();
@@ -58,18 +60,132 @@ class Functions
                     break;
                 default:
                     $_SESSION['message'] = "Something went wrong in switch";
-                    header('Location:users.php');
+                    header('Location:index.php');
                     exit();
             }
         } elseif (isset($_SESSION['action'])) {
-            //Hogyha a fő oldalról jelentkezünk ki akkor get metódust használunk, mivel egy link rákattintásával
-            // eltudjuk küldeni az értéket ami szükséges hogy a megfelelő fügvényt elinditsuk
+
             switch ($_SESSION['action']) {
 
                 case 'kijelentkezes':
                     $this->logOut();
                     break;
 
+            }
+        }
+    }
+
+    public function modifyTable()
+    {
+
+        $_SESSION['message'] = "Nothing was modified!";
+        global $conn;
+        $sql = "SELECT smokingArea FROM `table`  where tableId=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $_POST['tableId']);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        if (isset($_POST['sm']))
+            $sm = "Yes";
+
+         else $sm = "No";
+
+        if (isset($_POST['cap']) || isset($_POST['ar']) ||$result !=$sm || !empty($_FILES['picture']['name'])) {
+            global $conn;
+
+
+            try {
+                if ($result !=$sm) {
+                    $sql = "update `table` set smokingArea=? where tableId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si",  $sm, $_POST['tableId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Table modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        header('Location:  modifyTable.php');
+                        exit();
+
+                    }
+                }
+                if (isset($_POST['cap']) && $_POST['cap']!='Select') {
+
+                    $cap = $_POST['cap'];
+
+                    if (!is_numeric($cap)) {
+                        $_SESSION['message'] = "The number of capacity must be a number";
+                        header('Location: modifyTable.php');
+                        exit();
+                    }
+
+                    $sql = "update `table` set capacity=? where tableId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("ii", $cap, $_POST['tableId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Table modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        header('Location: modifyTable.php');
+                        exit();
+
+                    }
+                }
+
+                if (isset($_POST['ar']) && $_POST['ar']!='') {
+
+                    $ar = $_POST['ar'];
+
+                    if (is_numeric($ar)) {
+                        $_SESSION['message'] = "The Area can not contain number";
+                        header('Location: modifyTable.php');
+                        exit();
+                    }
+
+                    $sql = "update `table` set area=? where tableId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $ar, $_POST['tableId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Table modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        header('Location: modifyTable.php');
+                        exit();
+
+                    }
+                }
+                if (!empty($_FILES['picture']['name'])) {
+
+                    $picture = $this->picture("modifyTable.php");
+
+                    $sql = "update `table` set reservationPicture=? where tableId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $picture, $_POST['tableId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Table modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        header('Location: modifyTable.php');
+                        exit();
+
+                    }
+                }
+                header('Location: tables.php');
+                exit();
+            } catch (Exception $e) {
+                $_SESSION['message'] = "An error occurred: " . $e->getMessage();
             }
         }
     }
@@ -81,7 +197,7 @@ class Functions
             global $conn;
             $cap = $_POST['cap'];
             $ar = $_POST['ar'];
-            $picture = $this->picture();
+            $picture = $this->picture("AddTable.php");
             if (isset($_POST['sm'])) {
                 $sm = "Yes";
             } else $sm = "No";
@@ -111,11 +227,7 @@ class Functions
                 header('Location:addTable.php');
                 exit();
             }
-            //$this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=".$_SESSION['token']);
             try {
-                // SMTP settings
-                // Insert user data into the database
-
 
                 $sql = "INSERT INTO `table` (capacity, area, reservationPicture,smokingArea) VALUES (?,?,?,?)";
                 $stmt = $conn->prepare($sql);
@@ -127,7 +239,7 @@ class Functions
                     header('Location: tables.php');
                     exit(); // Exit script after redirection
                 } else {
-                    $_SESSION['message'] = "Error occurred during registration: " . $conn->error;
+                    $_SESSION['message'] = "Error occurred during adding table: " . $conn->error;
                     header('Location: addTable.php?token=' . $_SESSION['token']);
                     exit();
                 }
@@ -145,9 +257,9 @@ class Functions
                 $time = time();
                 $currentTime = date("Y-m-d H:i:s", $time);
                 if ($_POST['ban'] == "yes") {
-                    $sql = mysqli_prepare($conn, "UPDATE user SET banned=0,banned_time=0 WHERE userId=?");
+                    $sql = mysqli_prepare($conn, "UPDATE user SET banned=0,banned_time=? WHERE userId=?");
                     $_SESSION['message'] = "The person is unbanned";
-                    $sql->bind_param("i", $_POST['id']);
+                    $sql->bind_param("si", $currentTime, $_POST['id']);
                 } else {
                     $sql = mysqli_prepare($conn, "UPDATE user SET banned=1,banned_time=? WHERE userId=?");
                     $_SESSION['message'] = "The person is banned";
@@ -171,11 +283,11 @@ class Functions
 
     public function addWorker()
     {
-        if (isset($_POST['knev']) && isset($_POST['vnev']) && isset($_POST['tel1']) &&
+        if (isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['tel1']) &&
             isset($_POST['tel2']) && isset($_POST['mail'])) {
             global $conn;
-            $knev = $_POST['knev'];
-            $vnev = $_POST['vnev'];
+            $fname = $_POST['fname'];
+            $lname = $_POST['lname'];
             $tel1 = $_POST['tel1'];
 
             $tel2 = $_POST['tel2'];
@@ -184,7 +296,7 @@ class Functions
             $mail = $_POST['mail'];
             $_SESSION["workerEmail"] = $mail;
 
-            $this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php?token=" . $_SESSION['token']);
+            $this->userCheck1($fname, $lname, $mail, $tel2, "registration.php?token=" . $_SESSION['token']);
             try {
                 // SMTP settings
                 $time = time() + 60 * 10;
@@ -232,7 +344,7 @@ class Functions
 VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                     $stmt = $conn->prepare($sql);
 
-                    $stmt->bind_param("ssissiisssisss", $knev, $vnev, $tel, $mail, $pass, $verification_code,
+                    $stmt->bind_param("ssissiisssisss", $fname, $lname, $tel, $mail, $pass, $verification_code,
                         $verrification, $kep, $privilage, $verification_time,
                         $banned, $banned_time, $verification_code_pass, $verification_code_expire);
 
@@ -325,6 +437,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                 $sql->execute();
                 $count++;
                 $_SESSION['name'] = $_POST['firstName'];
+                $_SESSION['message'] = "First name is modified";
             } else
                 $_SESSION['name'] = $row['firstName'];
             if (isset($_POST['lastName']) && $_POST['lastName'] != "") {
@@ -333,6 +446,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                 $sql->execute();
                 $_SESSION['name'] = $_SESSION['name'] . " " . $_POST['lastName'];
                 $count++;
+                $_SESSION['message'] = "Last name is modified";
             } else
                 $_SESSION['name'] = $_SESSION['name'] . " " . $row['lastName'];
             if (isset($_POST['tel1']) && isset($_POST['tel2']) && $_POST['tel2'] != "") {
@@ -341,7 +455,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                 $sql->bind_param('is', $phoneNumber, $_SESSION['email']);
                 $sql->execute();
                 $count++;
-
+                $_SESSION['message'] = "Phone number is modified";
             }
         }
         if ($count != 0)
@@ -363,40 +477,40 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
 
             if ($pass == '') {
-                $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszó</b> mező";
+                $_SESSION['message'] = "The <b>Password</b> is not filled out";
                 header('Location: resetPassword.php');
                 exit();
             }
             if ($pass2 == '') {
-                $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszóbiztosítása</b> mező";
+                $_SESSION['message'] = "The <b>Confirmation Password</b> is not filled out";
                 header('Location: resetPassword.php');
                 exit();
             }
             if ($pass != $pass2) {
-                $_SESSION['message'] = "Nem eggyezik a jelszó";
+                $_SESSION['message'] = "The Passwords do not match";
                 header('Location: resetPassword.php');
                 exit();
             }
             if (!(preg_match("/[a-z]/", $pass))) {
-                $_SESSION['message'] = "Nincsen <b>kisbetű</b> a jelszóban";
+                $_SESSION['message'] = "The <b>Password</b> does not contain <b>Lower case</b>";
                 header('Location: resetPassword.php');
                 exit();
 
             }
             if (!(preg_match("/[A-Z]/", $pass))) {
-                $_SESSION['message'] = "Nincsen <b>nagybetű</b> a jelszóban";
+                $_SESSION['message'] = "The <b>Password</b> does not contain <b>Upper case</b>.";
                 header('Location: resetPassword.php');
                 exit();
 
             }
             if (!(preg_match("/[0-9]+/", $pass))) {
-                $_SESSION['message'] = "Nem tartalmaz <b>számokat</b> a jelszó";
+                $_SESSION['message'] = "The <b>Password</b> does not contain <b>Numbers</b>.";
                 header('Location: resetPassword.php');
                 exit();
 
             }
             if (strlen($pass) < 8) {
-                $_SESSION['message'] = "A jelszó legalább<b> 8 karaktert</b> kell hogy tartalmazzon";
+                $_SESSION['message'] = "The <b>Password</b> has to be <b> characters long</b>.";
                 header('Location: resetPassword.php');
                 exit();
             }
@@ -429,7 +543,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
     {
         global $conn;
         if (isset($_FILES['picture'])) {
-            $target_dir = "C:/xampp/htdocs/Restaurant/pictures/";
+            $target_dir = "https://humanz.stud.vts.su.ac.rs/Restaurant/";
             $target_file = $target_dir . basename($_FILES["picture"]["name"]);
             $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -458,12 +572,22 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
                     if (!exif_imagetype($file_temp)) {
                         $_SESSION['message'] = "File is not a picture!";
+                        $logType = "Picture";
+                        $logText = "The file is not in correct format";
+                        $logMessage =  $_SESSION['message'];
+
+                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
                         header('location: ' . $target);
                         exit();
                     }
                     $file_size = $file_size / 1024;
                     if ($file_size > 200) {
                         $_SESSION['message'] = "File is to big!";
+                        $logType = "Picture";
+                        $logText = "The file is bigger than 200KB";
+                        $logMessage =  $_SESSION['message'];
+
+                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
                         header('location: ' . $target);
                         exit();
                     }
@@ -480,7 +604,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                     $new_file_name = Date("YmdHis") . "$alias.$extension";
                     // 20171110084338.jpg
                     // 20191112134305-vts.jpg
-                    $directory = "C:/xampp/htdocs/Restaurant/pictures/";
+                    $directory = "https://humanz.stud.vts.su.ac.rs/Restaurant/";
 
                     $upload = "$directory/$new_file_name"; // images/20191112134305-vts.jpg
 
@@ -581,14 +705,26 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                             exit();
                         }
                     } else {
+                        $logType = "Log in";
+                        $logText = "The password was not valid!";
+                        $logMessage = "Wrong password!";
+
+                        $this->errorLogInsert($mail, $logText, $logType, $logMessage);
                         $_SESSION['message'] = "Wrong password!";
                     }
                 }
             } else {
-                $_SESSION['message'] = "Not registered email!";
+                $_SESSION['message'] = "Something went wrong, maybe the mail is not registered!";
+                $logType = "Log in";
+                $logText = "The E-mal is not in our database";
+                $logMessage =  $_SESSION['message'];
+
+                $this->errorLogInsert($mail, $logText, $logType, $logMessage);
+
             }
         } else {
             $_SESSION['message'] = "Email or password not set!";
+
         }
 
 
@@ -598,11 +734,11 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
     public function registration()
     {
-        if (isset($_POST['knev']) && isset($_POST['vnev']) && isset($_POST['tel1']) && isset($_POST['tel2']) && isset($_POST['mail']) && isset($_POST['pass']) && isset($_POST['pass2'])) {
+        if (isset($_POST['fname']) && isset($_POST['lname']) && isset($_POST['tel1']) && isset($_POST['tel2']) && isset($_POST['mail']) && isset($_POST['pass']) && isset($_POST['pass2'])) {
             global $conn;
 
-            $knev = $_POST['knev'];
-            $vnev = $_POST['vnev'];
+            $fname = $_POST['fname'];
+            $lname = $_POST['lname'];
             $tel1 = $_POST['tel1'];
 
             $tel2 = $_POST['tel2'];
@@ -613,7 +749,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
             $pass = $_POST['pass'];
             $pass2 = $_POST['pass2'];
 
-            $this->userCheck1($knev, $vnev, $mail, $tel2, "registration.php");
+            $this->userCheck1($fname, $lname, $mail, $tel2, "registration.php");
 
             $this->passwordCheck($pass, $pass2, "registration.php");
 
@@ -633,7 +769,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
                         if ($rows['userMail'] == $mail) {
                             if ($rows['verify'] == 1) {
-                                $_SESSION['message'] = "Nem sikerült a <b>Regisztráció</b> győződjön meg arról hogy jól vitte be az email címét vagy hogy nem regisztrált-e már";
+                                $_SESSION['message'] = "The <b>Registration</b> has not been successful! Try again or check if your mail is not registered here";
                                 header('Location: registration.php');
                                 exit();
                             } else {
@@ -642,7 +778,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                                 $query = mysqli_prepare($conn, "UPDATE user SET verification_code = ? ,verification_time =? WHERE userMail = ?");
                                 $query->bind_param("sss", $verification_code, $verification_time, $mail);
                                 $query->execute();
-                                $_SESSION['message'] = "Ha ön szerint az<b>E-mail</b> cím nincs regisztrálva van, akkor próbálja újra";
+                                $_SESSION['message'] = "If ypu think the<b>E-mail</b> address is registered try again.";
                                 $_SESSION['verification_code'] = $verification_code;
                                 $_SESSION['email'] = $mail;
 
@@ -678,7 +814,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
                     $stmt = $conn->prepare($sql);
                     $verrification = 0; // Placeholder for verification_code
-                    $stmt->bind_param("ssissiissssisss", $knev, $vnev, $tel, $mail, $pass,
+                    $stmt->bind_param("ssissiissssisss", $fname, $lname, $tel, $mail, $pass,
                         $verification_code,
                         $verrification, $kep, $privilage, $currentTime, $verification_time,
                         $banned, $banned_time, $verification_code_pass, $verification_code_expire);
@@ -736,79 +872,79 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
     public function passwordCheck($password, $password2, $location)
     {
         if ($password == '') {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszó</b> mező";
+            $_SESSION['message'] = "The <b>Password</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
         if ($password2 == '') {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>Jelszóbiztosítása</b> mező";
+            $_SESSION['message'] = "The <b>Confirmation Password</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
         if ($password != $password2) {
-            $_SESSION['message'] = "Nem eggyezik a jelszó";
+            $_SESSION['message'] = "The Passwords do not match";
             header('Location: ' . $location);
             exit();
         }
         if (!(preg_match("/[a-z]/", $password))) {
-            $_SESSION['message'] = "Nincsen <b>kisbetű</b> a jelszóban";
+            $_SESSION['message'] = "The <b>Password</b> does not contain <b>Lower case</b>.";
             header('Location: ' . $location);
             exit();
 
         }
         if (!(preg_match("/[A-Z]/", $password))) {
-            $_SESSION['message'] = "Nincsen <b>nagybetű</b> a jelszóban";
+            $_SESSION['message'] = "The <b>Password</b> does not contain <b>Upper case</b>.";
             header('Location: ' . $location);
             exit();
 
         }
         if (!(preg_match("/[0-9]+/", $password))) {
-            $_SESSION['message'] = "Nem tartalmaz <b>számokat</b> a jelszó";
+            $_SESSION['message'] = "The <b>Password</b> does not contain <b>Numbers</b>.";
             header('Location: ' . $location);
             exit();
 
         }
         if (strlen($password) < 8) {
-            $_SESSION['message'] = "A jelszó legalább<b> 8 karaktert</b> kell hogy tartalmazzon";
+            $_SESSION['message'] = "The <b>Password</b> has to be <b> characters long</b>.";
             header('Location: ' . $location);
             exit();
         }
     }
 
-    public function userCheck1($knev, $vnev, $email, $tel2, $location)
+    public function userCheck1($fname, $lname, $email, $tel2, $location)
     {
-        if ($knev == '') {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>First Name</b> mező";
+        if ($fname == '') {
+            $_SESSION['message'] = "The <b>First Name</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
-        if ($vnev == '') {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>Last Name</b> mező";
+        if ($lname == '') {
+            $_SESSION['message'] = "The <b>Last Name</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
         if ($email == '') {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>E-mail</b> mező";
+            $_SESSION['message'] = "The <b>E-mail</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/[0-9]+/", $knev)) {
-            $_SESSION['message'] = "A <b>Keresztnév</b> mező tartalmaz számot";
+        if (preg_match("/[0-9]+/", $fname)) {
+            $_SESSION['message'] = "The <b>First Name</b> filled contains <b>Numbers</b>.";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/\s/", $knev)) {
-            $_SESSION['message'] = "A <b>Keresztnév</b> mező tartalmaz üres helyet";
+        if (preg_match("/\s/", $fname)) {
+            $_SESSION['message'] = "The <b>First Name</b> filled contains <b>Spaces</b>";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/[0-9]+/", $vnev)) {
-            $_SESSION['message'] = "A <b>Vezetéknév</b> mező tartalmaz számot";
+        if (preg_match("/[0-9]+/", $lname)) {
+            $_SESSION['message'] = "The <b>Last Name</b> filled contains <b>Numbers</b>";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/\s/", $vnev)) {
-            $_SESSION['message'] = "A <b>Vezetéknév</b> mező tartalmaz üres helyet";
+        if (preg_match("/\s/", $lname)) {
+            $_SESSION['message'] = "The <b>Last Name</b> filled contains <b>Spaces</b>";
             header('Location: ' . $location);
             exit();
         }
@@ -819,44 +955,44 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
         }
         if ($tel2 != "") {
             if (strlen($tel2) != 7) {
-                $_SESSION['message'] = "A <b>Telefonszám</b> nem létezik";
+                $_SESSION['message'] = "The <b>Phone Number</b> does not exist!";
                 header('Location: ' . $location);
                 exit();
             }
         } else {
-            $_SESSION['message'] = "Nincsen kitöltve a <b>Phone Number</b> mező";
+            $_SESSION['message'] = "The <b>Phone Number</b> is not filled out";
             header('Location: ' . $location);
             exit();
         }
 
     }
 
-    public function userModifyData($knev, $vnev, $tel2, $location)
+    public function userModifyData($fname, $lname, $tel2, $location)
     {
 
-        if (preg_match("/[0-9]+/", $knev)) {
-            $_SESSION['message'] = "A <b>Keresztnév</b> mező tartalmaz számot";
+        if (preg_match("/[0-9]+/", $fname)) {
+            $_SESSION['message'] = "The <b>First Name</b> filled contains <b>Numbers</b>.";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/\s/", $knev)) {
-            $_SESSION['message'] = "A <b>Keresztnév</b> mező tartalmaz üres helyet";
+        if (preg_match("/\s/", $fname)) {
+            $_SESSION['message'] = "The <b>First Name</b> filled contains <b>Spaces</b>";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/[0-9]+/", $vnev)) {
-            $_SESSION['message'] = "A <b>Vezetéknév</b> mező tartalmaz számot";
+        if (preg_match("/[0-9]+/", $lname)) {
+            $_SESSION['message'] = "The <b>Last Name</b> filled contains <b>Numbers</b>";
             header('Location: ' . $location);
             exit();
         }
-        if (preg_match("/\s/", $vnev)) {
-            $_SESSION['message'] = "A <b>Vezetéknév</b> mező tartalmaz üres helyet";
+        if (preg_match("/\s/", $lname)) {
+            $_SESSION['message'] = "The <b>Last Name</b> filled contains <b>Spaces</b>";
             header('Location: ' . $location);
             exit();
         }
         if ($tel2 != "") {
             if (strlen($tel2) != 7) {
-                $_SESSION['message'] = "A <b>Telefonszám</b> nem létezik";
+                $_SESSION['message'] = "The <b>Phone Number</b> does not exist!";
                 header('Location: ' . $location);
                 exit();
             }
