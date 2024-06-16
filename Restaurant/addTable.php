@@ -17,14 +17,15 @@
 <body>
 
 <form method="post" action="functions.php" class="mainForm" enctype="multipart/form-data">
+    <a class="nextPage" href="tables.php">Back</a><br><br>
     <h2>Add Table</h2>
     <input type='file' name='picture' id='pictureInput' hidden="hidden">
     <a style="color: #b3cdb3; font-size: 22px; background-color: #1a6556; border: solid 3px cyan;
      margin: 50px; border-radius:10px; padding: 10px "
-       onclick='activateProfilePicture()'>Set Profile Picture</a><br><br>
+       onclick='activateProfilePicture()'>Set Table Picture</a><br><br>
     <label for="book">Table capacity:</label>
-    <select type="text" class="inputok" placeholder="Capacity" name="cap" id="cap" style="width: 60px">
-        <option hidden="hidden" value="Select"> </option>
+    <select type="text" class="inputok"  name="cap" id="cap" >
+        <option hidden="hidden" value="Select">None</option>
         <?php
         for($i=2;$i<=10;$i++){
             echo "<option value='$i'>$i</option>";
