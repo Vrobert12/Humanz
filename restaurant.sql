@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Jún 19. 13:07
--- Kiszolgáló verziója: 10.4.32-MariaDB
--- PHP verzió: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Jun 19, 2024 at 06:50 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Adatbázis: `restaurant`
+-- Database: `restaurant`
 --
 
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `coupon`
+-- Table structure for table `coupon`
 --
 
 CREATE TABLE `coupon` (
@@ -37,7 +37,7 @@ CREATE TABLE `coupon` (
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `errorlog`
+-- Table structure for table `errorlog`
 --
 
 CREATE TABLE `errorlog` (
@@ -49,7 +49,7 @@ CREATE TABLE `errorlog` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `errorlog`
+-- Dumping data for table `errorlog`
 --
 
 INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `errorTime`) VALUES
@@ -126,20 +126,29 @@ INSERT INTO `errorlog` (`errorLogId`, `errorType`, `errorMail`, `errorText`, `er
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `menu`
+-- Table structure for table `menu`
 --
 
 CREATE TABLE `menu` (
   `dishId` int(11) NOT NULL,
-  `dishName` int(11) NOT NULL,
-  `dishType` int(11) NOT NULL,
+  `dishName` varchar(50) NOT NULL,
+  `dishPicture` varchar(100) NOT NULL,
+  `dishType` varchar(30) NOT NULL,
   `dishPrice` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `menu`
+--
+
+INSERT INTO `menu` (`dishId`, `dishName`, `dishPicture`, `dishType`, `dishPrice`) VALUES
+(1, 'Pizza', 'pizza.jpg', 'Gluten free', 10),
+(2, 'Ramen', 'ramen.jpg', 'Vegetarian', 5);
 
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `reports`
+-- Table structure for table `reports`
 --
 
 CREATE TABLE `reports` (
@@ -152,7 +161,7 @@ CREATE TABLE `reports` (
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `reservation`
+-- Table structure for table `reservation`
 --
 
 CREATE TABLE `reservation` (
@@ -165,7 +174,7 @@ CREATE TABLE `reservation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `reservation`
+-- Dumping data for table `reservation`
 --
 
 INSERT INTO `reservation` (`reservationId`, `tableId`, `userId`, `reservationDay`, `reservationTime`, `period`) VALUES
@@ -194,7 +203,7 @@ INSERT INTO `reservation` (`reservationId`, `tableId`, `userId`, `reservationDay
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `table`
+-- Table structure for table `table`
 --
 
 CREATE TABLE `table` (
@@ -207,7 +216,7 @@ CREATE TABLE `table` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `table`
+-- Dumping data for table `table`
 --
 
 INSERT INTO `table` (`tableId`, `reservationPicture`, `capacity`, `area`, `smokingArea`, `workerId`) VALUES
@@ -222,7 +231,7 @@ INSERT INTO `table` (`tableId`, `reservationPicture`, `capacity`, `area`, `smoki
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE `user` (
@@ -245,7 +254,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`userId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `registrationTime`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
@@ -261,7 +270,7 @@ INSERT INTO `user` (`userId`, `firstName`, `lastName`, `phoneNumber`, `userMail`
 -- --------------------------------------------------------
 
 --
--- Tábla szerkezet ehhez a táblához `visitor`
+-- Table structure for table `visitor`
 --
 
 CREATE TABLE `visitor` (
@@ -270,45 +279,46 @@ CREATE TABLE `visitor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- A tábla adatainak kiíratása `visitor`
+-- Dumping data for table `visitor`
 --
 
 INSERT INTO `visitor` (`visitId`, `visitDate`) VALUES
 (0, '2024-06-15 22:03:33'),
 (0, '2024-06-16 10:22:25'),
 (0, '2024-06-16 10:24:36'),
-(0, '2024-06-19 10:03:53');
+(0, '2024-06-19 10:03:53'),
+(0, '2024-06-19 17:18:20');
 
 --
--- Indexek a kiírt táblákhoz
+-- Indexes for dumped tables
 --
 
 --
--- A tábla indexei `coupon`
+-- Indexes for table `coupon`
 --
 ALTER TABLE `coupon`
   ADD PRIMARY KEY (`couponId`);
 
 --
--- A tábla indexei `errorlog`
+-- Indexes for table `errorlog`
 --
 ALTER TABLE `errorlog`
   ADD PRIMARY KEY (`errorLogId`);
 
 --
--- A tábla indexei `menu`
+-- Indexes for table `menu`
 --
 ALTER TABLE `menu`
   ADD PRIMARY KEY (`dishId`);
 
 --
--- A tábla indexei `reports`
+-- Indexes for table `reports`
 --
 ALTER TABLE `reports`
   ADD PRIMARY KEY (`reportId`);
 
 --
--- A tábla indexei `reservation`
+-- Indexes for table `reservation`
 --
 ALTER TABLE `reservation`
   ADD PRIMARY KEY (`reservationId`),
@@ -316,58 +326,64 @@ ALTER TABLE `reservation`
   ADD KEY `fk_table_reservation` (`tableId`);
 
 --
--- A tábla indexei `table`
+-- Indexes for table `table`
 --
 ALTER TABLE `table`
   ADD PRIMARY KEY (`tableId`,`workerId`),
   ADD KEY `dolgozoId` (`workerId`);
 
 --
--- A tábla indexei `user`
+-- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`userId`);
 
 --
--- A kiírt táblák AUTO_INCREMENT értéke
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT a táblához `coupon`
+-- AUTO_INCREMENT for table `coupon`
 --
 ALTER TABLE `coupon`
   MODIFY `couponId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT a táblához `errorlog`
+-- AUTO_INCREMENT for table `errorlog`
 --
 ALTER TABLE `errorlog`
   MODIFY `errorLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
--- AUTO_INCREMENT a táblához `reservation`
+-- AUTO_INCREMENT for table `menu`
+--
+ALTER TABLE `menu`
+  MODIFY `dishId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `reservation`
 --
 ALTER TABLE `reservation`
   MODIFY `reservationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
--- AUTO_INCREMENT a táblához `table`
+-- AUTO_INCREMENT for table `table`
 --
 ALTER TABLE `table`
   MODIFY `tableId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT a táblához `user`
+-- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
   MODIFY `userId` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- Megkötések a kiírt táblákhoz
+-- Constraints for dumped tables
 --
 
 --
--- Megkötések a táblához `reservation`
+-- Constraints for table `reservation`
 --
 ALTER TABLE `reservation`
   ADD CONSTRAINT `fk_table_reservation` FOREIGN KEY (`tableId`) REFERENCES `table` (`tableId`),
