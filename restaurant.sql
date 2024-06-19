@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 19, 2024 at 06:50 PM
+-- Generation Time: Jun 19, 2024 at 07:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -134,7 +134,7 @@ CREATE TABLE `menu` (
   `dishName` varchar(50) NOT NULL,
   `dishPicture` varchar(100) NOT NULL,
   `dishType` varchar(30) NOT NULL,
-  `dishPrice` int(11) NOT NULL
+  `dishPrice` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -142,8 +142,8 @@ CREATE TABLE `menu` (
 --
 
 INSERT INTO `menu` (`dishId`, `dishName`, `dishPicture`, `dishType`, `dishPrice`) VALUES
-(1, 'Pizza', 'pizza.jpg', 'Gluten free', 10),
-(2, 'Ramen', 'ramen.jpg', 'Vegetarian', 5);
+(1, 'Pizza', 'pizza.jpg', 'Gluten free', 10.00),
+(2, 'Ramen', 'ramen.jpg', 'Vegetarian', 5.00);
 
 -- --------------------------------------------------------
 
