@@ -121,7 +121,7 @@
 
 
                             echo "</a><form method='post' action='functions.php' enctype='multipart/form-data'>";
-                            $_SESSION['backPic'] = "index.php";
+                            $_SESSION['backPic'] = "tables.php";
                             echo "<input class=\" dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
                             //láthatatlan, viszont kell a profilkép feltöltéshez
                             //Miután a képet feltöltöttük, az aktivája a fügvényt ami automatikusan megnyomja a sumbit gombot
@@ -140,7 +140,7 @@
 
 
                             echo "</a><form method='post' action='functions.php' enctype='multipart/form-data'>";
-                            $_SESSION['backPic'] = "index.php";
+                            $_SESSION['backPic'] = "tables.php";
                             echo "<input class=\" dropdown-item\"  type='file' name='picture' id='pictureInput' value='pictureUpload' style='display: none;' onchange=\"activateSubmit()\">";
                             //láthatatlan, viszont kell a profilkép feltöltéshez
                             //Miután a képet feltöltöttük, az aktivája a fügvényt ami automatikusan megnyomja a sumbit gombot

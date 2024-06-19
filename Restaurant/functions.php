@@ -616,10 +616,11 @@ if (isset($_FILES['picture'])) {
             }
         } else {
             echo "<p><b>Error!</b> Possible file upload attack!</p>";
+
         }
 
                 // Assuming 'profilkep' is a column in your table
-                if ($target == "index.php" || $target == "users.php"|| $target == "workers.php"|| $target == "tables.php") {
+                if ($target == "index.php" || $target == "users.php"|| $target == "workers.php"|| $target == "tables.php" || $target == "reports.php") {
 
                     $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
                     $query->bind_param("ss", $new_file_name, $_SESSION['email']);
@@ -631,7 +632,15 @@ if (isset($_FILES['picture'])) {
                     header('Location: ' . $_SESSION['backPic']);
                     exit(); // Exit after redirection
                 } else {
-                    return $new_file_name;
+                    $mail='Unknown';
+                    $logType = "file Upload";
+                    $logText = "Someone tried to upload a picture from a not valid page";
+                    $logMessage = "You can't upload a picture from another page!";
+
+                    $this->errorLogInsert($mail, $logText, $logType, $logMessage);
+                    $_SESSION['message'] = "Wrong password!";
+                    header('Location: ' . $_SESSION['backPic']);
+                    exit();
                 }
     }
 }
