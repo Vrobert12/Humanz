@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Add table</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="SideStyle.css">
     <script>
-
-
         function activateSubmit() {
             // Activate the submit button when a file is selected
             document.getElementById('submitButton').click();
@@ -32,10 +37,23 @@
             xhr.send();
         }
 
+        function fetchDishesByType() {
+            var selectedType = document.getElementById("dishTypeSelect").value;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "fetch_dishes.php?dishType=" + selectedType, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    document.getElementById("dishContainer").innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        }
+
         function refreshPage() {
             window.location.reload();
         }
     </script>
+<!--    <script src="dishes.js"></script>-->
 </head>
 <body>
 <?php
@@ -86,18 +104,54 @@ if ($result->num_rows > 0) {
     $_SESSION['maxTableId'] = $row['max_tableId'];
 }
 ?>
+<form class="menuForm">
+    <h2>Menu</h2>
+    <label class="bold">Type:
+        <select class="inputok" id="dishTypeSelect" onchange="fetchDishesByType()">
+            <?php
+            include 'connection.php';
+            global $conn;
 
+            $sqlType = $conn->prepare("SELECT DISTINCT dishType FROM menu");
+            $sqlType->execute();
+            $res = $sqlType->get_result();
+            if ($res->num_rows > 0) {
+                while ($row = $res->fetch_assoc()) {
+                    echo "<option value='" . $row['dishType'] . "'>" . $row['dishType'] . "</option>";
+                }
+            }
+            ?>
+        </select>
+    </label>
+    <div class="container text-center" id="dishContainer">
+        <?php
+        $command = "SELECT * FROM menu";
+        $stmt = $conn->prepare($command);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="row align-items-start">';
+                echo '<div class="col"><img src="' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
+                echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . $row['dishType'] . ")</label></div>";
+                echo "<div class='row align-items-start'><label>Price: " . $row['dishPrice'] . "€</label></div>";
+                echo '</div></div>';
+            }
+        }
+        ?>
+    </div>
+</form>
 <form method="post"
       action="reservation.php?table=<?php if (isset($_GET['table']) && $_GET['table'] > 0 && $_GET['table'] <= $_SESSION['maxTableId']) echo $_GET['table']; else {
           header('location:tables.php');
           exit();
-      } ?>" class="reservationForm">
+      } ?>&" class="reservationForm">
     <a class="nextPage" href="tables.php">Back</a>
     <?php if ($_GET['table'] > 1) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] - 1) . "\">Previous table</a>"; ?>
     <?php if ($_GET['table'] < $_SESSION['maxTableId']) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] + 1) . "\">Next table</a>";
 
 
-    echo "<h2>Reservation for table " . $_GET['table'] . "</h2>";
+    echo "<br><br><h2>Reservation for table " . $_GET['table'] . "</h2>";
 
 
     $today = date("Y-m-d");
@@ -151,7 +205,7 @@ if ($result->num_rows > 0) {
             exit();
         }
 
-        echo '<label for="res">Reservation Date:</label><br><br>';
+        echo '<label for="res" class="fix">Reservation Date:</label><br><br>';
         if (!isset($_POST['day'])) {
             echo '<input type="date" style="width: 240px" class="inputok" name="day" id="day" onchange="activateSubmit()">';
         } else {
