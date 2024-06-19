@@ -33,7 +33,7 @@ class Functions
                     $this->logOut();
                     break;
                 case 'picture':
-                    $this->picture("index.php");
+                    $this->picture($_SESSION['backPic']);
                     break;
 
                 case 'ResetPass':
@@ -542,98 +542,84 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
     public function picture($target = " ")
     {
         global $conn;
-        if (isset($_FILES['picture'])) {
-            $target_dir = "https://humanz.stud.vts.su.ac.rs/Restaurant/";
-            $target_file = $target_dir . basename($_FILES["picture"]["name"]);
-            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+if (isset($_FILES['picture'])) {
+    $target_dir = "pictures/";  // Local directory for storing uploaded files
+    $target_file = $target_dir . basename($_FILES["picture"]["name"]);
+    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-            $kep = pathinfo($target_file, PATHINFO_FILENAME);
-            $kep_dir = $imageFileType;
-            $kep = $kep . "." . $kep_dir;
-            if ($_FILES['picture']["error"] > 0) {
-                return $_FILES["picture"]["error"];
+    $kep = pathinfo($target_file, PATHINFO_FILENAME);
+    $kep_dir = $imageFileType;
+    $kep = $kep . "." . $kep_dir;
+
+    if ($_FILES['picture']["error"] > 0) {
+        return $_FILES["picture"]["error"];
+    } else {
+        if (is_uploaded_file($_FILES['picture']['tmp_name'])) {
+
+            $file_name = $_FILES['picture']["name"];
+            $file_temp = $_FILES["picture"]["tmp_name"];
+            $file_size = $_FILES["picture"]["size"];
+            $file_type = $_FILES["picture"]["type"];
+            $file_error = $_FILES['picture']["error"];
+
+            if (!exif_imagetype($file_temp)) {
+                $_SESSION['message'] = "File is not a picture!";
+                $logType = "Picture";
+                $logText = "The file is not in correct format";
+                $logMessage = $_SESSION['message'];
+
+                $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
+                header('location: ' . $target);
+                exit();
+            }
+            $file_size = $file_size / 1024;
+            if ($file_size > 200) {
+                $_SESSION['message'] = "File is too big!";
+                $logType = "Picture";
+                $logText = "The file is bigger than 200KB";
+                $logMessage = $_SESSION['message'];
+
+                $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
+                header('location: ' . $target);
+                exit();
+            }
+
+            $ext_temp = explode(".", $file_name);
+            $extension = end($ext_temp);
+
+            if (isset($_POST['alias'])) {
+                $alias = $_POST['alias'];
             } else {
-                if (is_uploaded_file($_FILES['picture']['tmp_name'])) {
+                $alias = "";
+            }
 
-                    $file_name = $_FILES['picture']["name"];
-                    $file_temp = $_FILES["picture"]["tmp_name"];
-                    $file_size = $_FILES["picture"]["size"];
-                    $file_type = $_FILES["picture"]["type"];
-                    $file_error = $_FILES['picture']["error"];
-                    // The full path as submitted by the browser.
-                    // This value does not always contain a real directory structure, and cannot be trusted. Available as of PHP 8.1.0.
+            $new_file_name = Date("YmdHis") . "$alias.$extension";
+            $upload = "$target_dir$new_file_name";
 
+            if (!is_dir($target_dir)) {
+                mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
+            }
 
-                    // http://en.wikipedia.org/wiki/Exchangeable_image_file_format
-                    // http://www.php.net/manual/en/book.exif.php
+            if (!file_exists($upload)) {
+                if (move_uploaded_file($file_temp, $upload)) {
+                    $size = getimagesize($upload);
+                    var_dump($size);
+                    foreach ($size as $key => $value)
+                        echo "$key = $value<br>";
 
-
-                    echo exif_imagetype($file_temp) . "<br>";
-
-                    if (!exif_imagetype($file_temp)) {
-                        $_SESSION['message'] = "File is not a picture!";
-                        $logType = "Picture";
-                        $logText = "The file is not in correct format";
-                        $logMessage =  $_SESSION['message'];
-
-                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
-                        header('location: ' . $target);
-                        exit();
-                    }
-                    $file_size = $file_size / 1024;
-                    if ($file_size > 200) {
-                        $_SESSION['message'] = "File is to big!";
-                        $logType = "Picture";
-                        $logText = "The file is bigger than 200KB";
-                        $logMessage =  $_SESSION['message'];
-
-                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
-                        header('location: ' . $target);
-                        exit();
-                    }
-
-                    $ext_temp = explode(".", $file_name); //
-                    $extension = end($ext_temp);
-
-                    if (isset($_POST['alias'])) {
-                        $alias = $_POST['alias'];
-                    } else {
-                        $alias = "";
-                    }
-
-                    $new_file_name = Date("YmdHis") . "$alias.$extension";
-                    // 20171110084338.jpg
-                    // 20191112134305-vts.jpg
-                    $directory = "https://humanz.stud.vts.su.ac.rs/Restaurant/";
-
-                    $upload = "$directory/$new_file_name"; // images/20191112134305-vts.jpg
-
-
-                    if (!is_dir($directory)) //is_dir("images")
-                        mkdir($directory);
-
-                    if (!file_exists($upload)) //images/back.png
-                    {
-                        if (move_uploaded_file($file_temp, $upload)) {
-
-                            $size = getimagesize($upload);
-                            var_dump($size);
-                            foreach ($size as $key => $value)
-                                echo "$key = $value<br>";
-
-                            echo "<img src=\"$upload\" $size[3] alt=\"$file_name\">";
-
-                            // width="1000" height="669"
-                            // <img src="pic.gif" width="1000" height="669" alt="pic" />
-                        } else
-                            echo "<p><b>Error!</b></p>";
-                    } else
-                        echo "<p><b>File with this name already exists!</b></p>";
+                    echo "<img src=\"$upload\" $size[3] alt=\"$file_name\">";
+                } else {
+                    echo "<p><b>Error!</b> Failed to move uploaded file.</p>";
                 }
-
+            } else {
+                echo "<p><b>Error!</b> File with this name already exists!</p>";
+            }
+        } else {
+            echo "<p><b>Error!</b> Possible file upload attack!</p>";
+        }
 
                 // Assuming 'profilkep' is a column in your table
-                if ($target == "index.php") {
+                if ($target == "index.php" || $target == "users.php"|| $target == "workers.php"|| $target == "tables.php") {
 
                     $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
                     $query->bind_param("ss", $new_file_name, $_SESSION['email']);
@@ -647,8 +633,9 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
                 } else {
                     return $new_file_name;
                 }
-            }
-        }
+    }
+}
+
         return "no";
     }
 
