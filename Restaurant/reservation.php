@@ -108,6 +108,7 @@ if ($result->num_rows > 0) {
     <h2>Menu</h2>
     <label class="bold">Type:
         <select class="inputok" id="dishTypeSelect" onchange="fetchDishesByType()">
+                <option>Ordinary</option>
             <?php
             include 'connection.php';
             global $conn;
@@ -132,7 +133,7 @@ if ($result->num_rows > 0) {
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 echo '<div class="row align-items-start">';
-                echo '<div class="col"><img src="' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
+                echo '<div class="col"><img src="' . $row['dishPicture'] . '" alt="img" width="140px" height="120px"/></div>';
                 echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . $row['dishType'] . ")</label></div>";
                 echo "<div class='row align-items-start'><label>Price: " . $row['dishPrice'] . "€</label></div>";
                 echo '</div></div>';
