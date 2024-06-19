@@ -682,7 +682,7 @@ if (isset($_FILES['picture'])) {
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
 
-
+                sleep(2);
                 if (empty($row['userPassword'])) {
                     $_SESSION['message'] = "The worker did not set up a password!";
                 } else {
@@ -691,7 +691,7 @@ if (isset($_FILES['picture'])) {
                         if ($row['banned']) {
                             $_SESSION['message'] = "You have been banned from our website!";
                         } else {
-
+                           
                             $_SESSION['email'] = $row['userMail'];
                             $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
                             $_SESSION['profilePic'] = $row['profilePic'];

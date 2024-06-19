@@ -35,7 +35,7 @@
         include 'connection.php';
         global $conn;
         if ($conn) {
-            if( $_SESSION['privalage'] != "admin"){
+            if( $_SESSION['privalage'] != "admin" && $_SESSION['privalage'] != "worker"){
                 header('Location: index.php');
                 exit();
             }
@@ -46,7 +46,7 @@
 
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
-                        if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
+                        if ($_SESSION['email'] == $row['userMail'] && ($row['privilage'] == "Admin" || $row['privilage'] == "Worker")) {
                             echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
                             echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
 

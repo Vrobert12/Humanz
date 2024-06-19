@@ -35,7 +35,7 @@
         include 'connection.php';
         global $conn;
         if ($conn) {
-            if( $_SESSION['privalage'] != "admin" || $_SESSION['privalage'] != "worker"){
+            if( $_SESSION['privalage'] != "admin" && $_SESSION['privalage'] != "worker"){
                 header('Location: index.php');
                 exit();
             }

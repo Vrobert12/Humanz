@@ -15,7 +15,14 @@
 
 </script>
 <body>
+<?php
+session_start();
 
+if( $_SESSION['privalage'] != "admin" && $_SESSION['privalage'] != "worker"){
+    header('Location:tables.php');
+    exit();
+}
+?>
 <form method="post" action="functions.php" class="mainForm" enctype="multipart/form-data">
     <a class="nextPage" href="tables.php">Back</a><br><br>
     <h2>Add Table</h2>
@@ -35,7 +42,7 @@
 
     </select><br>
     <input type="hidden" class="inputok" name="tableId" id="sm" value="<?php
-    session_start();
+
     if(isset($_GET['table'])){echo $_GET['table'];
         $_SESSION['tableId']=$_GET['table'];
     }
