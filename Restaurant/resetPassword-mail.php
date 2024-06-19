@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bejelentkezés</title>
+    <title>Reset Mail Password</title>
     <link rel="stylesheet" href="SideStyle.css">
 
 </head>

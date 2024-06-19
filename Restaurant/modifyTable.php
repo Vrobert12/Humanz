@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add table</title>
+    <title>Modify table</title>
     <link rel="stylesheet" href="SideStyle.css">
 </head>
 <script>
@@ -25,7 +25,7 @@ if( $_SESSION['privalage'] != "admin" && $_SESSION['privalage'] != "worker"){
 ?>
 <form method="post" action="functions.php" class="mainForm" enctype="multipart/form-data">
     <a class="nextPage" href="tables.php">Back</a><br><br>
-    <h2>Add Table</h2>
+    <h2>Modify Table</h2>
     <input type='file' name='picture' id='pictureInput' hidden="hidden">
     <a style="color: #b3cdb3; font-size: 22px; background-color: #1a6556; border: solid 3px cyan;
      margin: 50px; border-radius:10px; padding: 10px "

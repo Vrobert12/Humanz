@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Regisztrálás</title>
+    <title>Registration</title>
     <link rel="stylesheet" href="SideStyle.css">
     <?php include "connection.php"; ?>
     <style>

@@ -1,5 +1,6 @@
 <html>
 <head>
+    <title>Report</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -50,8 +51,8 @@
                             echo "<li><a class=\"d-block d-lg-none\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i></a></li>";;
                             echo "<li><a class=\"d-none d-lg-block\" href=\"index.php\"><i class=\"fa-2x bi bi-arrow-return-left\"></i> Back to Main</a></li>";;
 
-                            echo '<li><form method="post" action="workers.php"></li>
-            <input type="text" style="width: 300px; font-size: 30px; height: 50px;" placeholder="search" name="searchMail">
+                            echo '<li><form method="post" action="reports.php"></li>
+            <input type="text" style="width: 300px; font-size: 30px; height: 50px;" placeholder="YYYY-MM-DD" name="searchDate">
               
             <li> <a class="justify-content-end" onclick="activateSearch()"><i class="fa-2x bi bi-search"></i></a></li>
          <li><a class="justify-content-end" onclick="deleteSearch()"><i class="fa-2x bi bi-x-lg"></i></a></li>
@@ -192,30 +193,65 @@ $_SESSION['message'] = "";
 </body>
 </html>
 <?php
-include "classUser.php";
-//A session segitsegevel megadjuk az adatok ertekeit
+
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
-    if (isset($_POST['searchAction'])) {
-        if ($_POST['searchAction'] == 'search') {
 
-            $usersData = new User("Worker",$_POST['searchMail'],"workers.php");
-            $usersData->userString();
-
-        } else {
-
-            $usersData = new User("Worker",0,"workers.php");
-            $usersData->userString();
-        }
+    if (isset($_POST['searchAction']) && !empty($_POST['searchDate'])) {
+        $searchDate = $_POST['searchDate'];
+        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount FROM reservation WHERE reservationDay = ? GROUP BY reservationDay DESC");
+        $sql->bind_param("s", $_POST['searchDate']);
+        $reservationLength = 1; // Only show results for the searched date
     } else {
-        $usersData = new User("Worker",0,"workers.php");
-        $usersData->userString();
+        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount FROM reservation GROUP BY reservationDay DESC");
+        $reservationLength = 7; // Show results for the last 7 days if no specific date is searched
     }
 
+    $sql->execute();
+    $result = $sql->get_result();
 
+    $reservations = [];
+    while ($row = $result->fetch_assoc()) {
+        $reservations[$row['reservationDay']] = $row['reservationCount'];
+    }
+
+    $_SESSION['previousPage'] = "reports.php";
+    echo '<div class="container">
+            <div class="row justify-content-around">';
+
+    $today = new DateTime();
+    for ($i = 0; $i < $reservationLength; $i++) {
+        if (isset($_POST['searchAction']) && !empty($_POST['searchDate'])) {
+            $day = $_POST['searchDate'];
+        } else {
+            $day = $today->format('Y-m-d');
+        }
+
+        $reservationCount = isset($reservations[$day]) ? $reservations[$day] : 0;
+        echo '<div class="col-xl-4 p-3 border bg-dark" style="margin: auto; margin-top:100px; margin-bottom: 50px; left:0; right:0; width: fit-content">';
+        echo "<label>Reservation Day: " . $day . "</label><br>";
+        if ($reservationCount > 0) {
+            echo "<label>Number of Reservations: " . $reservationCount . "</label><br>";
+            echo '<form method="post" action="generate_pdf.php" target="_blank">
+                    <input type="hidden" name="reservationDay" value="' . $day . '">
+                    <button type="submit" class="btn btn-primary">Generate PDF for ' . $day . '</button>
+                  </form>';
+        } else {
+            echo "<label>No reservations</label><br>";
+            // Add a form to handle the PDF generation or any other action
+            echo '<form method="post" action="generate_pdf.php" target="_blank">
+                    <input type="hidden" name="reservationDay" value="' . $day . '">
+                    <button type="submit" class="btn btn-primary">Generate PDF for ' . $day . '</button>
+                  </form>';
+        }
+
+        echo "</div>";
+
+        $today->modify('-1 day');
+    }
+
+    echo '</div></div>';
 } else {
-    header('Location: index.php');
-    exit();
+    echo "No reservations found.";
 }
-
-
 ?>
+

@@ -51,6 +51,12 @@ class Functions
                 case 'ModifyTable':
                     $this->modifyTable();
                     break;
+                case 'AddMenu':
+                    $this->addMenu();
+                    break;
+                case 'ModifyDish':
+                    $this->modifyMenu();
+                    break;
                 case 'BanPerson':
                 case 'UnBanPerson':
                     $this->ban();
@@ -74,6 +80,182 @@ class Functions
             }
         }
     }
+    public function modifyMenu()
+    {
+
+        $_SESSION['message'] = "Nothing was modified!";
+
+        if (isset($_POST['dishName']) || isset($_POST['dishType'])  || isset($_POST['dishPrice']) || !empty($_FILES['picture']['name'])) {
+            global $conn;
+
+            try {
+
+                if (isset($_POST['dishType']) && $_POST['dishType'] != 'Type') {
+
+                    $dishType = $_POST['dishType'];
+
+                    if (is_numeric($dishType)) {
+                        $_SESSION['message'] = "The dish type can not contain a number!";
+                        header('Location: modifyTable.php');
+                        exit();
+                    }
+
+                    $sql = "update menu set dishType=? where dishId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $dishType, $_POST['menuId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Menu has been modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
+                        header('Location: modifyMenu.php');
+                        exit();
+
+                    }
+                }
+
+                if (isset($_POST['dishName']) && $_POST['dishName'] != '') {
+
+                    $dishName = $_POST['dishName'];
+
+                    if (is_numeric($dishName)) {
+                        $_SESSION['message'] = "The dish name can not contain number";
+                        header('Location: modifyTable.php');
+                        exit();
+                    }
+
+                    $sql = "update menu set dishName=? where dishId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $dishName, $_POST['menuId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Menu has been modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
+                        header('Location: modifyMenu.php');
+                        exit();
+
+                    }
+                }
+                if (!empty($_FILES['picture']['name'])) {
+
+                    $picture = $this->picture("modifyMenu.php");
+
+                    $sql = "update menu set dishPicture=? where dishId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $picture, $_POST['menuId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Menu has been modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
+                        header('Location: modifyTable.php');
+                        exit();
+
+                    }
+                }
+                if (isset($_POST['dishPrice']) && $_POST['dishPrice'] != '') {
+
+                    $dishPrice = $_POST['dishPrice'];
+
+                    if (!is_numeric($dishPrice)) {
+                        $_SESSION['message'] = "The dish price can not contain number";
+                        header('Location: modifyTable.php');
+                        exit();
+                    }
+
+                    $sql = "update menu set dishPrice=? where dishId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $dishPrice, $_POST['menuId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Menu has been modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
+                        header('Location: modifyMenu.php');
+                        exit();
+
+                    }
+                }
+                header('Location: menu.php');
+                exit();
+            } catch (Exception $e) {
+                $_SESSION['message'] = "An error occurred: " . $e->getMessage();
+            }
+        }
+    }
+    public function addMenu()
+    {
+        if (isset($_POST['dishName']) && isset($_POST['dishType']) && isset($_POST['dishPrice'])) {
+            global $conn;
+            $dishName = $_POST['dishName'];
+            $dishType = $_POST['dishType'];
+            $dishPrice = $_POST['dishPrice'];
+            $picture = $this->picture("addMenu.php");
+
+            if (empty($_FILES['picture']['name'])) {
+                $_SESSION['message'] = "You must add a picture";
+                header('Location:addMenu.php');
+                exit();
+            }
+            if ($dishName == '') {
+                $_SESSION['message'] = "The number of dish name must contain data";
+                header('Location:addMenu.php');
+                exit();
+            }
+            if ($dishType == 'Type') {
+                $_SESSION['message'] = "The dish type name must contain data";
+                header('Location:addMenu.php');
+                exit();
+            }
+
+            if ($dishPrice == '') {
+                $_SESSION['message'] = "The dish price name must contain data";
+                header('Location:addMenu.php');
+                exit();
+            }
+
+            if (!is_numeric($dishPrice)) {
+                $_SESSION['message'] = "The dish price can not contain number";
+                header('Location:addMenu.php');
+                exit();
+            }
+            try {
+
+                $sql = "INSERT INTO menu (dishName, dishPicture, dishType,dishPrice) VALUES (?,?,?,?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sssi", $dishName, $picture, $dishType, $dishPrice);
+                if ($stmt->execute()) {
+
+                    $_SESSION['message'] = "Menu added successfully!";
+                    $_SESSION['text'] = "<h2>Add table</h2>";
+                    header('Location: menu.php');
+                    exit(); // Exit script after redirection
+                } else {
+                    $_SESSION['message'] = "Error occurred during adding table: " . $conn->error;
+                    header('Location: addTable.php?token=' . $_SESSION['token']);
+                    exit();
+                }
+            } catch (Exception $e) {
+                $_SESSION['message'] = "An error occurred: " . $e->getMessage();
+                header('Location:addMenu.php');
+                exit();
+            }
+        } else {
+
+            $_SESSION['message'] = "An error occurred: ";
+            header('Location:addMenu.php');
+            exit();
+        }
+    }
 
     public function modifyTable()
     {
@@ -89,30 +271,30 @@ class Functions
         if (isset($_POST['sm']))
             $sm = "Yes";
 
-         else $sm = "No";
+        else $sm = "No";
 
-        if (isset($_POST['cap']) || isset($_POST['ar']) ||$result !=$sm || !empty($_FILES['picture']['name'])) {
+        if (isset($_POST['cap']) || isset($_POST['ar']) || $result != $sm || !empty($_FILES['picture']['name'])) {
             global $conn;
 
 
             try {
-                if ($result !=$sm) {
+                if ($result != $sm) {
                     $sql = "update `table` set smokingArea=? where tableId=?";
                     $stmt = $conn->prepare($sql);
-                    $stmt->bind_param("si",  $sm, $_POST['tableId']);
+                    $stmt->bind_param("si", $sm, $_POST['tableId']);
                     if ($stmt->execute()) {
 
                         $_SESSION['message'] = "Table modified successfully!";
                         $_SESSION['text'] = "<h2>Modify table</h2>";
 
                     } else {
-                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
                         header('Location:  modifyTable.php');
                         exit();
 
                     }
                 }
-                if (isset($_POST['cap']) && $_POST['cap']!='Select') {
+                if (isset($_POST['cap']) && $_POST['cap'] != 'Select') {
 
                     $cap = $_POST['cap'];
 
@@ -131,14 +313,14 @@ class Functions
                         $_SESSION['text'] = "<h2>Modify table</h2>";
 
                     } else {
-                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
                         header('Location: modifyTable.php');
                         exit();
 
                     }
                 }
 
-                if (isset($_POST['ar']) && $_POST['ar']!='') {
+                if (isset($_POST['ar']) && $_POST['ar'] != '') {
 
                     $ar = $_POST['ar'];
 
@@ -157,7 +339,7 @@ class Functions
                         $_SESSION['text'] = "<h2>Modify table</h2>";
 
                     } else {
-                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
                         header('Location: modifyTable.php');
                         exit();
 
@@ -176,7 +358,7 @@ class Functions
                         $_SESSION['text'] = "<h2>Modify table</h2>";
 
                     } else {
-                        $_SESSION['message'] = "Error occurred during Modifycation: " . $conn->error;
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
                         header('Location: modifyTable.php');
                         exit();
 
@@ -197,7 +379,7 @@ class Functions
             global $conn;
             $cap = $_POST['cap'];
             $ar = $_POST['ar'];
-            $picture = $this->picture("AddTable.php");
+            $picture = $this->picture("addTable.php");
             if (isset($_POST['sm'])) {
                 $sm = "Yes";
             } else $sm = "No";
@@ -542,110 +724,115 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
     public function picture($target = " ")
     {
         global $conn;
-if (isset($_FILES['picture'])) {
-    $target_dir = "pictures/";  // Local directory for storing uploaded files
-    $target_file = $target_dir . basename($_FILES["picture"]["name"]);
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if (isset($_FILES['picture'])) {
+            $target_dir = "pictures/";  // Local directory for storing uploaded files
+            $target_file = $target_dir . basename($_FILES["picture"]["name"]);
+            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    $kep = pathinfo($target_file, PATHINFO_FILENAME);
-    $kep_dir = $imageFileType;
-    $kep = $kep . "." . $kep_dir;
+            $kep = pathinfo($target_file, PATHINFO_FILENAME);
+            $kep_dir = $imageFileType;
+            $kep = $kep . "." . $kep_dir;
 
-    if ($_FILES['picture']["error"] > 0) {
-        return $_FILES["picture"]["error"];
-    } else {
-        if (is_uploaded_file($_FILES['picture']['tmp_name'])) {
-
-            $file_name = $_FILES['picture']["name"];
-            $file_temp = $_FILES["picture"]["tmp_name"];
-            $file_size = $_FILES["picture"]["size"];
-            $file_type = $_FILES["picture"]["type"];
-            $file_error = $_FILES['picture']["error"];
-
-            if (!exif_imagetype($file_temp)) {
-                $_SESSION['message'] = "File is not a picture!";
-                $logType = "Picture";
-                $logText = "The file is not in correct format";
-                $logMessage = $_SESSION['message'];
-
-                $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
-                header('location: ' . $target);
-                exit();
-            }
-            $file_size = $file_size / 1024;
-            if ($file_size > 200) {
-                $_SESSION['message'] = "File is too big!";
-                $logType = "Picture";
-                $logText = "The file is bigger than 200KB";
-                $logMessage = $_SESSION['message'];
-
-                $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
-                header('location: ' . $target);
-                exit();
-            }
-
-            $ext_temp = explode(".", $file_name);
-            $extension = end($ext_temp);
-
-            if (isset($_POST['alias'])) {
-                $alias = $_POST['alias'];
+            if ($_FILES['picture']["error"] > 0) {
+                return $_FILES["picture"]["error"];
             } else {
-                $alias = "";
-            }
+                if (is_uploaded_file($_FILES['picture']['tmp_name'])) {
 
-            $new_file_name = Date("YmdHis") . "$alias.$extension";
-            $upload = "$target_dir$new_file_name";
+                    $file_name = $_FILES['picture']["name"];
+                    $file_temp = $_FILES["picture"]["tmp_name"];
+                    $file_size = $_FILES["picture"]["size"];
+                    $file_type = $_FILES["picture"]["type"];
+                    $file_error = $_FILES['picture']["error"];
 
-            if (!is_dir($target_dir)) {
-                mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
-            }
+                    if (!exif_imagetype($file_temp)) {
+                        $_SESSION['message'] = "File is not a picture!";
+                        $logType = "Picture";
+                        $logText = "The file is not in correct format";
+                        $logMessage = $_SESSION['message'];
 
-            if (!file_exists($upload)) {
-                if (move_uploaded_file($file_temp, $upload)) {
-                    $size = getimagesize($upload);
-                    var_dump($size);
-                    foreach ($size as $key => $value)
-                        echo "$key = $value<br>";
+                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
+                        header('location: ' . $target);
+                        exit();
+                    }
+                    $file_size = $file_size / 1024;
+                    if ($file_size > 200) {
+                        $_SESSION['message'] = "File is too big!";
+                        $logType = "Picture";
+                        $logText = "The file is bigger than 200KB";
+                        $logMessage = $_SESSION['message'];
 
-                    echo "<img src=\"$upload\" $size[3] alt=\"$file_name\">";
+                        $this->errorLogInsert($_SESSION['email'], $logText, $logType, $logMessage);
+                        header('location: ' . $target);
+                        exit();
+                    }
+
+                    $ext_temp = explode(".", $file_name);
+                    $extension = end($ext_temp);
+
+                    if (isset($_POST['alias'])) {
+                        $alias = $_POST['alias'];
+                    } else {
+                        $alias = "";
+                    }
+
+                    $new_file_name = Date("YmdHis") . "$alias.$extension";
+                    $upload = "$target_dir$new_file_name";
+
+                    if (!is_dir($target_dir)) {
+                        mkdir($target_dir, 0777, true); // Create the directory if it doesn't exist
+                    }
+
+                    if (!file_exists($upload)) {
+                        if (move_uploaded_file($file_temp, $upload)) {
+                            $size = getimagesize($upload);
+                            var_dump($size);
+                            foreach ($size as $key => $value)
+                                echo "$key = $value<br>";
+
+                            echo "<img src=\"$upload\" $size[3] alt=\"$file_name\">";
+                        } else {
+                            echo "<p><b>Error!</b> Failed to move uploaded file.</p>";
+                        }
+                    } else {
+                        echo "<p><b>Error!</b> File with this name already exists!</p>";
+                    }
                 } else {
-                    echo "<p><b>Error!</b> Failed to move uploaded file.</p>";
+                    echo "<p><b>Error!</b> Possible file upload attack!</p>";
+
                 }
-            } else {
-                echo "<p><b>Error!</b> File with this name already exists!</p>";
-            }
-        } else {
-            echo "<p><b>Error!</b> Possible file upload attack!</p>";
+                if ($target != "addTable.php" && $target != "modifyMenu.php" && $target != "modifyTable.php" && $target != "addMenu.php") {
+
+
+                    // Assuming 'profilkep' is a column in your table
+                    if ($target == "index.php" || $target == "users.php" || $target == "workers.php" || $target == "tables.php"
+                        || $target == "reports.php" || $target == "menu.php") {
+
+                        $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
+                        $query->bind_param("ss", $new_file_name, $_SESSION['email']);
+                        $query->execute();
+                        $_SESSION['profilePic'] = $new_file_name;
+                        // Redirect to login page after successful upload
+
+
+                        header('Location: ' . $_SESSION['backPic']);
+                        exit(); // Exit after redirection
+                    }
+                   else {
+                        $mail = 'Unknown';
+                        $logType = "file Upload";
+                        $logText = "Someone tried to upload a picture from a not valid page";
+                        $logMessage = "You can't upload a picture from another page!";
+
+                        $this->errorLogInsert($mail, $logText, $logType, $logMessage);
+                        $_SESSION['message'] = "You can't upload a picture from another page!";
+                        header('Location: ' . $_SESSION['backPic']);
+                        exit();
+                    }
+                }
 
         }
-
-                // Assuming 'profilkep' is a column in your table
-                if ($target == "index.php" || $target == "users.php"|| $target == "workers.php"|| $target == "tables.php" || $target == "reports.php") {
-
-                    $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
-                    $query->bind_param("ss", $new_file_name, $_SESSION['email']);
-                    $query->execute();
-                    $_SESSION['profilePic'] = $new_file_name;
-                    // Redirect to login page after successful upload
-
-
-                    header('Location: ' . $_SESSION['backPic']);
-                    exit(); // Exit after redirection
-                } else {
-                    $mail='Unknown';
-                    $logType = "file Upload";
-                    $logText = "Someone tried to upload a picture from a not valid page";
-                    $logMessage = "You can't upload a picture from another page!";
-
-                    $this->errorLogInsert($mail, $logText, $logType, $logMessage);
-                    $_SESSION['message'] = "Wrong password!";
-                    header('Location: ' . $_SESSION['backPic']);
-                    exit();
-                }
-    }
-}
-
-        return "no";
+        }
+        return $_FILES['picture']["name"];
     }
 
     public function logOut()
@@ -691,7 +878,7 @@ if (isset($_FILES['picture'])) {
                         if ($row['banned']) {
                             $_SESSION['message'] = "You have been banned from our website!";
                         } else {
-                           
+
                             $_SESSION['email'] = $row['userMail'];
                             $_SESSION['name'] = $row['firstName'] . " " . $row['lastName'];
                             $_SESSION['profilePic'] = $row['profilePic'];
@@ -713,7 +900,7 @@ if (isset($_FILES['picture'])) {
                 $_SESSION['message'] = "Something went wrong, maybe the mail is not registered!";
                 $logType = "Log in";
                 $logText = "The E-mal is not in our database";
-                $logMessage =  $_SESSION['message'];
+                $logMessage = $_SESSION['message'];
 
                 $this->errorLogInsert($mail, $logText, $logType, $logMessage);
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add table</title>
+    <title>Add menu</title>
     <link rel="stylesheet" href="SideStyle.css">
 </head>
 <script>
@@ -18,6 +18,11 @@
 <?php
 session_start();
 
+if( $_SESSION['privalage'] != "admin"){
+    header('Location: index.php');
+    exit();
+}
+
 if (isset($_SESSION['token']) && isset($_GET['token'])) {
     if ($_SESSION['token'] != $_GET['token']) {
         header('location:' . $_SESSION['previousPage']);
@@ -27,31 +32,30 @@ if (isset($_SESSION['token']) && isset($_GET['token'])) {
         $_SESSION['token'] = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
     }
 }
-$_SESSION['backPic']="addTable.php";
+$_SESSION['backPic']="addMenu.php";
 ?>
 <form method="post" action="functions.php" class="mainForm" enctype="multipart/form-data">
-    <a class="nextPage" href="tables.php">Back</a><br><br>
+    <a class="nextPage" href="index.php">Back</a><br><br>
     <h2>Add Table</h2>
     <input type='file' name='picture' id='pictureInput' hidden="hidden">
     <a style="color: #b3cdb3; font-size: 22px; background-color: #1a6556; border: solid 3px cyan;
      margin: 50px; border-radius:10px; padding: 10px "
-       onclick='activateProfilePicture()'>Set Table Picture</a><br><br>
-    <label for="book">Table capacity:</label>
-    <select type="text" class="inputok"  name="cap" id="cap" >
-        <option hidden="hidden" value="Select">None</option>
-        <?php
-        for($i=2;$i<=10;$i++){
-            echo "<option value='$i'>$i</option>";
+       onclick='activateProfilePicture()'>Set Foods Picture</a><br><br>
+    <label for="dishName">Dish Name:</label><br>
+    <input type="text" class="inputok" placeholder="Name" name="dishName" id="dishName"><br>
+    <label for="dishType">Dish Type:</label><br>
+    <select type="text" class="inputok"  name="dishType" id="dishType" >
 
-        }
-        ?>
+        <option hidden="hidden" value="Type">Type</option>
+         <option value='Ordinary'>Ordinary</option>
+        <option value='Gluten free'>Gluten Free</option>
+        <option value='Vegetarian'>Vegetarian</option>
 
     </select><br>
-    <label for="ar">Area:</label><br>
-    <input type="text" class="inputok" placeholder="Area" name="ar" id="ar"><br>
-    <label for="ar">Is smoking area: </label>
-    <input type="checkbox" class="inputok" name="sm" id="sm"><br>
-    <input type="submit" class="inputok" name="action" value="AddTable">
+    <label for="dishPrice">Dish Price:</label><br>
+    <input type="text" class="inputok" placeholder="price" name="dishPrice" id="dishPrice"><br>
+
+    <input type="submit" class="inputok" name="action" value="AddMenu">
     <?php
 
 
