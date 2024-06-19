@@ -37,6 +37,10 @@ global $conn;
         if ($conn) {
 
             if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+                if( $_SESSION['privalage'] != "admin"){
+                    header('Location: index.php');
+                    exit();
+                }
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);
 
@@ -192,6 +196,7 @@ $_SESSION['message'] = "";
 include "classUser.php";
 //A session segitsegevel megadjuk az adatok ertekeit
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
+
     if (isset($_POST['searchAction'])) {
         if ($_POST['searchAction'] == 'search') {
 
@@ -209,7 +214,9 @@ if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['pr
     }
 
 
-} else {
+}
+
+else {
     header('Location: index.php');
     exit();
 }

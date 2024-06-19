@@ -35,7 +35,10 @@
         include 'connection.php';
         global $conn;
         if ($conn) {
-
+            if( $_SESSION['privalage'] != "admin" || $_SESSION['privalage'] != "worker"){
+                header('Location: index.php');
+                exit();
+            }
             if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
                 $sql = "SELECT * FROM user";
                 $stmt = $conn->query($sql);

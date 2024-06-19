@@ -53,13 +53,14 @@
                 echo ' 
            <a href="#" class="bar d-block d-lg-none"><h2><i class=" fa-3x bi bi-pc-display-horizontal"></i>  </h2></a>
             <a href="#" class="bar d-none d-lg-block"> <h2>  Tables</h2></a>';
+
                 if ($stmt->num_rows > 0)
                     while ($row = $stmt->fetch_assoc())
 
                 if ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Admin") {
 
                             $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-                            $_SESSION['previousPage']="workers.php";
+                            $_SESSION['previousPage']="tables.php";
                             echo "<li><a class=\"justify-content-end\" href=\"addTable.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
                         }
 

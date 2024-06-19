@@ -15,7 +15,20 @@
 
 </script>
 <body>
+<?php
+session_start();
 
+if (isset($_SESSION['token']) && isset($_GET['token'])) {
+    if ($_SESSION['token'] != $_GET['token']) {
+        header('location:' . $_SESSION['previousPage']);
+        $_SESSION['title'] = "";
+        exit();
+    } else {
+        $_SESSION['token'] = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
+    }
+}
+
+?>
 <form method="post" action="functions.php" class="mainForm" enctype="multipart/form-data">
     <a class="nextPage" href="tables.php">Back</a><br><br>
     <h2>Add Table</h2>
@@ -41,7 +54,7 @@
     <input type="submit" class="inputok" name="action" value="AddTable">
     <?php
 
-   session_start();
+
 
     if(isset($_SESSION['message']))
         echo "<p class='warning'>" . $_SESSION['message'] . "</p>";
