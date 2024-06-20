@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2024. Jún 19. 22:39
+-- Létrehozás ideje: 2024. Jún 20. 12:01
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -33,6 +33,20 @@ CREATE TABLE `coupon` (
   `discountCode` int(11) NOT NULL,
   `discountValidate` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- A tábla adatainak kiíratása `coupon`
+--
+
+INSERT INTO `coupon` (`couponId`, `discount`, `discountCode`, `discountValidate`) VALUES
+(1, 15, 12345678, 0),
+(2, 30, 23345465, 1),
+(3, 30, 12358778, 1),
+(4, 15, 54334594, 1),
+(5, 30, 13244365, 1),
+(6, 10, 32113096, 1),
+(7, 30, 32831086, 1),
+(8, 5, 10134249, 1);
 
 -- --------------------------------------------------------
 
@@ -192,37 +206,41 @@ CREATE TABLE `reservation` (
   `userId` int(11) NOT NULL,
   `reservationDay` date DEFAULT NULL,
   `reservationTime` time DEFAULT NULL,
-  `period` time NOT NULL
+  `period` time NOT NULL,
+  `reservationCode` int(6) DEFAULT NULL,
+  `discount` int(8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- A tábla adatainak kiíratása `reservation`
 --
 
-INSERT INTO `reservation` (`reservationId`, `tableId`, `userId`, `reservationDay`, `reservationTime`, `period`) VALUES
-(1, 1, 19, '2024-06-02', '17:00:00', '17:45:00'),
-(2, 1, 19, '2024-06-02', '15:15:00', '17:00:00'),
-(3, 1, 19, '2024-06-03', '15:15:00', '16:00:00'),
-(4, 1, 19, '2024-06-05', '15:15:00', '16:00:00'),
-(5, 1, 19, '2024-06-05', '15:15:00', '16:00:00'),
-(6, 1, 19, '2024-06-05', '15:15:00', '16:00:00'),
-(10, 2, 19, '2024-06-06', '15:30:00', '17:30:00'),
-(11, 3, 19, '2024-06-06', '15:00:00', '16:00:00'),
-(12, 3, 19, '2024-06-06', '15:00:00', '16:00:00'),
-(13, 3, 19, '2024-06-06', '15:00:00', '16:00:00'),
-(16, 3, 19, '2024-06-12', '17:45:00', '21:15:00'),
-(25, 2, 19, '2024-05-29', '15:45:00', '19:00:00'),
-(40, 1, 19, '2024-06-15', '16:00:00', '17:00:00'),
-(42, 1, 19, '2024-06-13', '18:30:00', '23:00:00'),
-(44, 2, 19, '2024-06-19', '18:00:00', '23:00:00'),
-(73, 2, 26, '2024-06-21', '16:15:00', '19:30:00'),
-(74, 2, 26, '2024-06-13', '15:00:00', '16:00:00'),
-(75, 5, 19, '2024-06-20', '15:00:00', '21:00:00'),
-(76, 3, 27, '2024-06-15', '15:00:00', '16:00:00'),
-(78, 7, 19, '2024-06-28', '15:00:00', '21:00:00'),
-(79, 2, 27, '2024-06-28', '15:15:00', '19:15:00'),
-(81, 5, 19, '2024-06-21', '15:00:00', '21:00:00'),
-(82, 1, 29, '2024-06-28', '18:30:00', '22:30:00');
+INSERT INTO `reservation` (`reservationId`, `tableId`, `userId`, `reservationDay`, `reservationTime`, `period`, `reservationCode`, `discount`) VALUES
+(1, 1, 19, '2024-06-02', '17:00:00', '17:45:00', NULL, NULL),
+(2, 1, 19, '2024-06-02', '15:15:00', '17:00:00', NULL, NULL),
+(3, 1, 19, '2024-06-03', '15:15:00', '16:00:00', NULL, NULL),
+(4, 1, 19, '2024-06-05', '15:15:00', '16:00:00', NULL, NULL),
+(5, 1, 19, '2024-06-05', '15:15:00', '16:00:00', NULL, NULL),
+(6, 1, 19, '2024-06-05', '15:15:00', '16:00:00', NULL, NULL),
+(10, 2, 19, '2024-06-06', '15:30:00', '17:30:00', NULL, NULL),
+(11, 3, 19, '2024-06-06', '15:00:00', '16:00:00', NULL, NULL),
+(12, 3, 19, '2024-06-06', '15:00:00', '16:00:00', NULL, NULL),
+(13, 3, 19, '2024-06-06', '15:00:00', '16:00:00', NULL, NULL),
+(16, 3, 19, '2024-06-12', '17:45:00', '21:15:00', NULL, NULL),
+(25, 2, 19, '2024-05-29', '15:45:00', '19:00:00', NULL, NULL),
+(40, 1, 19, '2024-06-15', '16:00:00', '17:00:00', NULL, NULL),
+(42, 1, 19, '2024-06-13', '18:30:00', '23:00:00', NULL, NULL),
+(44, 2, 19, '2024-06-19', '18:00:00', '23:00:00', NULL, NULL),
+(73, 2, 26, '2024-06-21', '16:15:00', '19:30:00', NULL, NULL),
+(74, 2, 26, '2024-06-13', '15:00:00', '16:00:00', NULL, NULL),
+(75, 5, 19, '2024-06-20', '15:00:00', '21:00:00', NULL, NULL),
+(76, 3, 27, '2024-06-15', '15:00:00', '16:00:00', NULL, NULL),
+(78, 7, 19, '2024-06-28', '15:00:00', '21:00:00', NULL, NULL),
+(79, 2, 27, '2024-06-28', '15:15:00', '19:15:00', NULL, NULL),
+(100, 5, 19, '2024-06-28', '17:15:00', '21:30:00', 213798, 32113096),
+(103, 2, 29, '2024-06-27', '16:45:00', '21:15:00', 293744, NULL),
+(104, 1, 19, '2024-06-21', '19:00:00', '23:00:00', 108065, NULL),
+(105, 1, 19, '2024-07-05', '19:15:00', '23:30:00', 714909, 12358778);
 
 -- --------------------------------------------------------
 
@@ -284,7 +302,7 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`userId`, `firstName`, `lastName`, `phoneNumber`, `userMail`, `userPassword`, `profilePic`, `privilage`, `registrationTime`, `verification_code`, `verify`, `verification_time`, `banned`, `banned_time`, `passwordValidation`, `passwordValidationTime`) VALUES
 (6, 'Nikoletta', 'Varro', 0, 'nikolettavarro12@gmail.com', '$2y$10$ZJtAXGLi1y8Y7VlLzE4Ru.nH.SbV5pbDRtoQTlOv88WgemWiSIrB2', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 401081, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
 (7, 'Nikoletta', 'Varro', 0, 'nikolettavarro@gmail.com', '$2y$10$GZ9eslD9.lWIwuBi0by.sunJYqe1s8Jn8K2eX4CefmMN/LOnyRNua', 'logInPic.png', 'Guest', '0000-00-00 00:00:00', 102107, 0, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 0, '2024-04-23 09:54:10'),
-(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$cPLcJMsanfIKcT/RSF3rgO1zc/9JEbFgnD9YuEMZoFbNstohYDBha', '20240619205458.png', 'Admin', '0000-00-00 00:00:00', 229527, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 136415, '2024-06-15 11:28:52'),
+(19, 'Róbert', 'Varró', 649420637, 'robertvarro12@gmail.com', '$2y$10$cPLcJMsanfIKcT/RSF3rgO1zc/9JEbFgnD9YuEMZoFbNstohYDBha', '20240620082809.png', 'Admin', '0000-00-00 00:00:00', 229527, 1, '2024-04-29 22:00:00', 0, '0000-00-00 00:00:00', 136415, '2024-06-15 11:28:52'),
 (25, 'Dominik', 'Hupko', 628277140, 'hupkodominik143@gmail.com', '$2y$10$2GtJU92kqTP4FioPdkS0WuXGDZMTqQwpEuDToq9suKr3T7XP37EEm', 'logInPic.png', 'Guest', '2024-06-03 12:23:54', 2047970, 1, '2024-06-03 12:33:54', 0, '0000-00-00 00:00:00', NULL, '2024-06-03 12:23:54'),
 (26, 'Robert', 'Hupko', 649420637, 'varorobert03@gmail.com', '$2y$10$vVRKD1BHdxuVyK2Q1yAFiutrZafKmdOPO5HD1GhEctq8BgxUuQoa.', 'logInPic.png', 'Guest', '2024-06-12 16:21:21', 3652391, 1, '2024-06-12 16:31:21', 0, '2024-06-12 16:21:22', NULL, '2024-06-12 16:21:22'),
 (27, 'Robert', 'Varro', 649420637, 'vaorobert03@gmail.com', '$2y$10$WLNUBEgiMnWyRdJYBqrQXOUu3kKCaJlkirZYbg.u4.UNkFMavtedi', '20240615204340.avif', 'Worker', '2024-06-15 11:30:27', 9844306, 1, '2024-06-15 11:40:27', 0, '0000-00-00 00:00:00', NULL, '2024-06-15 11:30:27'),
@@ -310,7 +328,8 @@ INSERT INTO `visitor` (`visitId`, `visitDate`) VALUES
 (0, '2024-06-15 22:03:33'),
 (0, '2024-06-16 10:22:25'),
 (0, '2024-06-16 10:24:36'),
-(0, '2024-06-19 10:03:53');
+(0, '2024-06-19 10:03:53'),
+(0, '2024-06-20 10:06:01');
 
 --
 -- Indexek a kiírt táblákhoz
@@ -369,7 +388,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT a táblához `coupon`
 --
 ALTER TABLE `coupon`
-  MODIFY `couponId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `couponId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT a táblához `errorlog`
@@ -387,7 +406,7 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT a táblához `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `reservationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `reservationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT a táblához `table`
