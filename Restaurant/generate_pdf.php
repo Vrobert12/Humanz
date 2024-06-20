@@ -14,11 +14,15 @@ if (isset($_POST['reservationDay'])) {
     $reservationDay = $_POST['reservationDay'];
 
     // Prepare SQL statement with parameter binding to avoid SQL injection
-    $sql = $conn->prepare("SELECT CONCAT(u.firstName, ' ', u.lastName) AS name, r.*
-                           FROM user u
-                           INNER JOIN reservation r ON u.userId = r.userId
-                           WHERE r.reservationDay = ?
-                           ORDER BY r.reservationTime ASC");
+    $sql = $conn->prepare("SELECT r.reservationId, r.tableId, r.userId, r.reservationDay, r.reservationTime, r.period, r.discount as discountCode,
+       CONCAT(u.firstName, ' ', u.lastName) AS userName,c.discount
+FROM reservation r
+JOIN coupon c ON r.discount = c.discountCode
+JOIN user u ON u.userId = r.userId
+WHERE  r.reservationDay = ?
+ORDER BY r.reservationTime ASC;
+
+");
     $sql->bind_param("s", $reservationDay); // Bind parameter
     $sql->execute(); // Execute SQL query
     $result = $sql->get_result(); // Get result set
@@ -53,6 +57,9 @@ if (isset($_POST['reservationDay'])) {
                             <th>Name</th>
                             <th>Reservation Time</th>
                             <th>Period</th>
+                              <th>Coupon Code</th>
+                            <th>Coupon Discount</th>
+                          
                         </tr>
                     </thead>
                     <tbody>';
@@ -61,9 +68,11 @@ if (isset($_POST['reservationDay'])) {
         while ($row = $result->fetch_assoc()) {
             $html .= '<tr>
                         <td>' . $row['tableId'] . '</td>
-                        <td>' . $row['name'] . '</td>
+                        <td>' . $row['userName'] . '</td>
                         <td>' . $row['reservationTime'] . '</td>
                         <td>' . $row['period'] . '</td>
+                         <td>' . $row['discountCode'] . '</td>
+                         <td>' . $row['discount'] . '%</td>
                       </tr>';
         }
 

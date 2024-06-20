@@ -76,9 +76,9 @@ $_SESSION['email']=$_SESSION['mailReset'];
 
         $_SESSION['message']="<b>You have reserved table ". $_SESSION['reservationTable']."</b>";
         $mail->Body = "<h2>You have reserved our table </h2>  Reservation is on day <b>".$_SESSION['day']."</b> from <b>"
-            .$_SESSION['reservationTime']."</b> to <b>".$_SESSION['reservationTimeEnd']."";
+            .$_SESSION['reservationTime']."</b> to <b>".$_SESSION['reservationTimeEnd'].". Your reservation code is: ".$_SESSION['reservationCode']."</b>";
         $mail->AltBody = "<h2>You have reserved our table </h2>  Reservation is on day <b>".$_SESSION['day']."</b> from <b>"
-            .$_SESSION['reservationTime']."</b> to <b>".$_SESSION['reservationTimeEnd']."";
+            .$_SESSION['reservationTime']."</b> to <b>".$_SESSION['reservationTimeEnd'].". Your reservation code is: ".$_SESSION['reservationCode']."</b>";
         unset($_SESSION['workerEmail']);
         header('Location:reservation.php?table='.$_SESSION['reservationTable']);
     }

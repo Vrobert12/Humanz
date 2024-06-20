@@ -50,7 +50,7 @@ function handleInput(event) {
 
     if (input.id === 'pass') {
         isValid = validatePassword(input.value);
-        if (!isValid) showError(input.id, 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.');
+        if (!isValid) showError(input.id, 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number and one symbol.');
     }
 
     if (input.id === 'pass2') {

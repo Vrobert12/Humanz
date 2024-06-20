@@ -87,7 +87,7 @@ class Functions
     {
         if (isset($_POST['discount']) ) {
             global $conn;
-    
+
             $discount = $_POST['discount'];
 
             $discountCode=substr(number_format(time() * rand(), 0, '', ''), 0, 8);
@@ -1134,25 +1134,28 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?,?)";
             $_SESSION['message'] = "The <b>Password</b> does not contain <b>Lower case</b>.";
             header('Location: ' . $location);
             exit();
-
         }
         if (!(preg_match("/[A-Z]/", $password))) {
             $_SESSION['message'] = "The <b>Password</b> does not contain <b>Upper case</b>.";
             header('Location: ' . $location);
             exit();
-
         }
         if (!(preg_match("/[0-9]+/", $password))) {
             $_SESSION['message'] = "The <b>Password</b> does not contain <b>Numbers</b>.";
             header('Location: ' . $location);
             exit();
-
         }
-        if (strlen($password) < 8) {
-            $_SESSION['message'] = "The <b>Password</b> has to be <b> characters long</b>.";
+        if (!(preg_match("/[!@#$%^&*()\-_=+{};:,<.>]/", $password))) {
+            $_SESSION['message'] = "The <b>Password</b> does not contain <b>Symbols</b>.";
             header('Location: ' . $location);
             exit();
         }
+        if (strlen($password) < 8) {
+            $_SESSION['message'] = "The <b>Password</b> has to be <b>8 characters long</b>.";
+            header('Location: ' . $location);
+            exit();
+        }
+
     }
 
     public function userCheck1($fname, $lname, $email, $tel2, $location)

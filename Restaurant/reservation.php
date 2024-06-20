@@ -54,7 +54,7 @@
             window.location.reload();
         }
     </script>
-<!--    <script src="dishes.js"></script>-->
+    <!--    <script src="dishes.js"></script>-->
 </head>
 <body>
 <?php
@@ -104,14 +104,14 @@ if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $_SESSION['maxTableId'] = $row['max_tableId'];
 }
+
 ?>
-<form class="menuForm">
+<form class="menuForm" method="post">
     <h2>Menu</h2>
     <label class="bold">Type:
         <select class="inputok" id="dishTypeSelect" onchange="fetchDishesByType()">
             <?php
-            include 'connection.php';
-            global $conn;
+
 
             $sqlType = $conn->prepare("SELECT DISTINCT dishType FROM menu");
             $sqlType->execute();
@@ -124,29 +124,74 @@ if ($result->num_rows > 0) {
             ?>
         </select>
     </label>
+    <br><br>
+    <label for="codeInput">Coupon code:</label>
+    <input type="text" name="code" id="codeInput"><br>
+    <input class="inputok" type="submit" name="action" value="UseCoupon">
     <div class="container text-center" id="dishContainer">
         <?php
+
+        ob_start(); // Start output buffering
+
+        if (isset($_POST['action']) && $_POST['action'] == 'UseCoupon') {
+            $_SESSION['couponDiscount'] = 1;
+            // Validate the coupon code
+            $code = $_POST['code'] ?? '';
+            $sql = $conn->prepare("SELECT * FROM coupon WHERE discountValidate=1 ORDER BY discount DESC");
+            $sql->execute();
+            $discountResult = $sql->get_result();
+
+            if ($discountResult->num_rows > 0) {
+                while ($rowDiscount = $discountResult->fetch_assoc()) {
+                    if ($rowDiscount['discountCode'] == $code) {
+                        $_SESSION['couponDiscount'] = 1 - ($rowDiscount['discount'] / 100);
+                        $_SESSION['discountCode'] = $rowDiscount['discountCode'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Fetch menu items
         $command = "SELECT * FROM menu";
         $stmt = $conn->prepare($command);
         $stmt->execute();
         $result = $stmt->get_result();
+
+        // Output HTML
+
+        // Prepare and execute the query to fetch all menu items
+        $command = "SELECT * FROM menu";
+        $stmt = $conn->prepare($command);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Initialize coupon discount session variable
+
+
+        // Check if there are menu items to display
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
+                $sum=$row['dishPrice'] * $_SESSION['couponDiscount'];
+                // Display menu items with applied discount
                 echo '<div class="row align-items-start">';
-                echo '<div class="col"><img src="' . $row['dishPicture'] . '" alt="img" width="140px" height="120px"/></div>';
-                echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . $row['dishType'] . ")</label></div>";
-                echo "<div class='row align-items-start'><label>Price: " . $row['dishPrice'] . "€</label></div>";
+                echo '<div class="col"><img src="' . htmlspecialchars($row['dishPicture']) . '" alt="img" width="140px" height="120px"/></div>';
+                echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . htmlspecialchars($row['dishType']) . ")</label></div>";
+                echo "<div class='row align-items-start'><label>Price: " . $sum . "€</label></div>";
                 echo '</div></div>';
             }
+        } else {
+            echo '<p>No menu items found.</p>';
         }
         ?>
+
     </div>
 </form>
 <form method="post"
       action="reservation.php?table=<?php if (isset($_GET['table']) && $_GET['table'] > 0 && $_GET['table'] <= $_SESSION['maxTableId']) echo $_GET['table']; else {
           header('location:tables.php');
           exit();
-      } ?>&" class="reservationForm">
+      }?>" class="reservationForm">
     <a class="nextPage" href="tables.php">Back</a>
     <?php if ($_GET['table'] > 1) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] - 1) . "\">Previous table</a>"; ?>
     <?php if ($_GET['table'] < $_SESSION['maxTableId']) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] + 1) . "\">Next table</a>";
@@ -170,13 +215,20 @@ if ($result->num_rows > 0) {
             // Prepare and execute the first query
 
             $_SESSION['reservation'] = 1;
-
+            $_SESSION['reservationCode'] = substr(number_format(time() * rand(), 0, '', ''), 0, 6);
             // Clear the result set
             $result->free();
+if(isset($_SESSION['discountCode'])) {
+    // Prepare and execute the insert query
+    $insert_sql = $conn->prepare("INSERT INTO reservation (tableId, userId, reservationDay, reservationTime, period,reservationCode,discount) VALUES (?, ?, ?, ?,?, ?,?)");
+    $insert_sql->bind_param("iisssii", $_GET['table'], $_SESSION['userID'], $_POST['day'], $_SESSION['reservationTime'],
+        $_POST['reservationTimeEnd'],$_SESSION['reservationCode'],$_SESSION['discountCode']);
+}
+else{
+    $insert_sql = $conn->prepare("INSERT INTO reservation (tableId, userId, reservationDay, reservationTime, period,reservationCode) VALUES (?, ?, ?, ?, ?,?)");
+    $insert_sql->bind_param("iisssi", $_GET['table'], $_SESSION['userID'], $_POST['day'], $_SESSION['reservationTime'], $_POST['reservationTimeEnd'],$_SESSION['reservationCode'],);
 
-            // Prepare and execute the insert query
-            $insert_sql = $conn->prepare("INSERT INTO reservation (tableId, userId, reservationDay, reservationTime, period) VALUES (?, ?, ?, ?, ?)");
-            $insert_sql->bind_param("iisss", $_GET['table'], $_SESSION['userID'], $_POST['day'], $_SESSION['reservationTime'], $_POST['reservationTimeEnd']);
+}
             $insert_sql->execute();
 
             // Check for successful insertion
@@ -195,7 +247,7 @@ if ($result->num_rows > 0) {
 
             $insert_sql->close();
         } elseif (isset($_POST['reservationTimeEnd']) && $_POST['reservationTimeEnd'] == "Select Time") {
-            $_SESSION['reservationMessage'] = "You have too select when do you want your reservation to end.";
+            $_SESSION['reservationMessage'] = $_SESSION['reservationMessage']. "<br>You have to select when do you want your reservation to end.";
             unset($_POST['reservationTimeEnd']);
         }
         $_SESSION['reservationTime'] = " ";
@@ -346,7 +398,10 @@ if ($result->num_rows > 0) {
             }
         }
     } else {
-        $_SESSION['reservationMessage'] = "You have too many reservations, you can't reserve more tables today.";
+        if(isset($_SESSION['reservationMessage']))
+            $_SESSION['reservationMessage'] = $_SESSION['reservationMessage'] . "<br>You have too many reservations, you can't reserve more tables today.";
+        else
+            $_SESSION['reservationMessage'] = "You have too many reservations, you can't reserve more tables today.";
     }
     if (isset($_SESSION['reservationMessage'])) {
         echo '<div style="display: flex; justify-content: center; align-items: center; margin: 20px 0;">';
@@ -387,6 +442,7 @@ if ($result->num_rows > 0) {
         }
         echo '<th style="padding: 12px; border: 1px solid #ddd;">Reservation Day</th>';
         echo '<th style="padding: 12px; border: 1px solid #ddd;">Reservation Time - Period</th>';
+        echo '<th style="padding: 12px; border: 1px solid #ddd;">Code</th>';
         echo '<th style="padding: 12px; border: 1px solid #ddd;">Cancel</th>';
         echo '</tr>';
         echo '</thead>';
@@ -402,6 +458,7 @@ if ($result->num_rows > 0) {
             }
             echo '<th style="padding: 10px; border: 1px solid #ddd;">' . $row['reservationDay'] . '</th>';
             echo '<th style="padding: 10px; border: 1px solid #ddd;">' . $row['reservationTime'] . ' - ' . $row['period'] . '</th>';
+            echo '<th style="padding: 10px; border: 1px solid #ddd;">' . $row['reservationCode'] . '</th>';
             echo '<th style="padding: 10px; border: 1px solid #ddd;">
     <form method="post" action="reservation.php?table=' . $_GET['table'] . '" >
     <input type="submit" name="delete" value="delete" class="inputok" onclick="confirmDeletion();">
@@ -438,10 +495,6 @@ if ($result->num_rows > 0) {
     echo '</form>';
 
     ?>
-    <form class="couponForm" method="post">
-        <label for="codeInput">Coupon code:</label>
-        <input type="text" name="code" id="codeInput"><br>
-        <input class="inputok" type="submit" name="action" value="Submit">
-    </form>
+
 </body>
 </html>
