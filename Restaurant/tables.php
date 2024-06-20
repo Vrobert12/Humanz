@@ -216,24 +216,28 @@ function users($command,$param = null)
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
 
-        echo'<div class="container">
-  <div class="row justify-content-around" >';
-        while ($row = $result->fetch_assoc()) {
+        echo '<div class="container">
+  <div class="row justify-content-around">';
 
-            echo ' <div class="col-xl-4 p-5 border bg-dark" style="  
- margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
-            echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" 
-src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/" . $row['reservationPicture'] . "
-          \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><label>ID: " . $row['tableId'] . "</label><br>
-<label>Capacity: " . $row['capacity'] . "</label><br>
+while ($row = $result->fetch_assoc()) {
+    echo '<div class="col-xl-4 p-5 border bg-dark" style="margin: auto; margin-top:100px; margin-bottom: 50px; left:0; right:0; width: fit-content">';
+    echo '<div class="col-xl-4">';
+    echo '<img class="profilePic" src="https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/' . htmlspecialchars($row['reservationPicture']) . '" width="250" height="250" alt="profilkep">';
+    echo '</div>';
+    echo '<label>ID: ' . htmlspecialchars($row['tableId']) . '</label><br>';
+    echo '<label>Capacity: ' . htmlspecialchars($row['capacity']) . '</label><br>';
+    echo '<label>Area: ' . htmlspecialchars($row['area']) . '</label><br>';
+    echo '<label>Smoking: ' . htmlspecialchars($row['smokingArea']) . '</label><br>';
+    echo '<label>Description: </label><br>';
+    echo '<label style="word-wrap: break-word; max-width: 250px;">' . htmlspecialchars($row['description']) . '</label><br>';
+    echo '<a href="reservation.php?table=' . htmlspecialchars($row['tableId']) . '">Reserve</a>&nbsp;&nbsp;&nbsp;';
+    if ($_SESSION['privalage'] == 'admin') {
+        echo '<a href="modifyTable.php?table=' . htmlspecialchars($row['tableId']) . '">Modify</a>';
+    }
+    echo '</div>';
+}
+echo '</div></div>';
 
-<label>Area: " . $row['area'] . "</label><br>
-<label>Smoking: " . $row['smokingArea'] . "</label><br>
-<a href=\"reservation.php?table=" . $row['tableId'] . "\">Reserve</a>&nbsp&nbsp&nbsp";
-            if( $_SESSION['privalage']=='admin')
-echo"<a href=\"modifyTable.php?table=" . $row['tableId'] . "\">Modify</a>";
-
-                echo"</div>";
 
             /*if($row['verify']==1){
                 echo '<label style="color: green; font-size: 20px">Verified</label><br>';
@@ -251,7 +255,7 @@ echo"<a href=\"modifyTable.php?table=" . $row['tableId'] . "\">Modify</a>";
 <input type='hidden' name='id' value='" . $row['tableId'] . "'>
 <input type='submit' class='more' name='userId' value='Bővebben' >
 </form></div>";*/
-        }
+
 
         echo "</div></div>";
     } else {

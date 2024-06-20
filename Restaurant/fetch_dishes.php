@@ -11,10 +11,11 @@ if (isset($_GET['dishType'])) {
     $result = $stmt->get_result();
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $sum=$row['dishPrice'] * $_SESSION['couponDiscount'];
             echo '<div class="row align-items-start">';
-            echo '<div class="col"><img src="http://localhost/Restaurant/pictures/' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
+            echo '<div class="col"><img src="https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
             echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . $row['dishType'] . ")</label></div>";
-            echo "<div class='row align-items-start'><label>Price: " . $row['dishPrice'] . "€</label></div>";
+            echo "<div class='row align-items-start'><label>Price: " . $sum . "€</label></div>";
             echo '</div></div>';
         }
     } else {

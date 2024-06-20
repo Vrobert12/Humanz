@@ -334,7 +334,8 @@ $couponIsValid=1;
 
         else $sm = "No";
 
-        if (isset($_POST['cap']) || isset($_POST['ar']) || $result != $sm || !empty($_FILES['picture']['name'])) {
+        if (isset($_POST['cap']) || isset($_POST['ar']) || $result != $sm || !empty($_FILES['picture']['name'])
+            || isset($_POST['description'])) {
             global $conn;
 
 
@@ -351,6 +352,23 @@ $couponIsValid=1;
                     } else {
                         $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
                         header('Location:  modifyTable.php');
+                        exit();
+
+                    }
+                }
+                if(isset($_POST['description']) && $_POST['description']!='') {
+
+                    $sql = "update `table` set description=? where tableId=?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param("si", $_POST['description'], $_POST['tableId']);
+                    if ($stmt->execute()) {
+
+                        $_SESSION['message'] = "Table modified successfully!";
+                        $_SESSION['text'] = "<h2>Modify table</h2>";
+
+                    } else {
+                        $_SESSION['message'] = "Error occurred during Modification: " . $conn->error;
+                        header('Location: modifyTable.php');
                         exit();
 
                     }
@@ -893,7 +911,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
         }
         }
-        return $_FILES['picture']["name"];
+        return $new_file_name;
     }
 
     public function logOut()
@@ -910,7 +928,6 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
     public function login()
     {
-        session_start();
 
         global $conn;
 

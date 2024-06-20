@@ -110,6 +110,7 @@ if ($result->num_rows > 0) {
     <h2>Menu</h2>
     <label class="bold">Type:
         <select class="inputok" id="dishTypeSelect" onchange="fetchDishesByType()">
+            <option hidden="hidden" value="Type">--Select Type--</option>
             <?php
 
 
@@ -128,11 +129,12 @@ if ($result->num_rows > 0) {
     <label for="codeInput">Coupon code:</label>
     <input type="text" name="code" id="codeInput"><br>
     <input class="inputok" type="submit" name="action" value="UseCoupon">
-    <div class="container text-center" id="dishContainer">
+    <div class="container text-center border border-black" id="dishContainer">
         <?php
 
         ob_start(); // Start output buffering
-
+        if(!isset($_SESSION['couponDiscount']))
+        $_SESSION['couponDiscount']=1;
         if (isset($_POST['action']) && $_POST['action'] == 'UseCoupon') {
             $_SESSION['couponDiscount'] = 1;
             // Validate the coupon code
@@ -146,6 +148,7 @@ if ($result->num_rows > 0) {
                     if ($rowDiscount['discountCode'] == $code) {
                         $_SESSION['couponDiscount'] = 1 - ($rowDiscount['discount'] / 100);
                         $_SESSION['discountCode'] = $rowDiscount['discountCode'];
+
                         break;
                     }
                 }
@@ -174,10 +177,10 @@ if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $sum=$row['dishPrice'] * $_SESSION['couponDiscount'];
                 // Display menu items with applied discount
-                echo '<div class="row align-items-start">';
-                echo '<div class="col"><img src="' . htmlspecialchars($row['dishPicture']) . '" alt="img" width="140px" height="120px"/></div>';
-                echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . htmlspecialchars($row['dishType']) . ")</label></div>";
-                echo "<div class='row align-items-start'><label>Price: " . $sum . "€</label></div>";
+                echo '<div class="row align-items-start border border-black">';
+                echo '<div class="col"><img src="https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/' . htmlspecialchars($row['dishPicture']) . '" alt="img" width="140px" height="110px"/></div>';
+                echo "<div class='col'><div class='row align-items-start border border-black'><label>Name: " . $row['dishName'] . " (" . htmlspecialchars($row['dishType']) . ")</label></div>";
+                echo "<div class='row align-items-start border border-black'><label>Price: " . $sum . "€</label></div>";
                 echo '</div></div>';
             }
         } else {
@@ -191,7 +194,7 @@ if ($result->num_rows > 0) {
       action="reservation.php?table=<?php if (isset($_GET['table']) && $_GET['table'] > 0 && $_GET['table'] <= $_SESSION['maxTableId']) echo $_GET['table']; else {
           header('location:tables.php');
           exit();
-      }?>" class="reservationForm">
+      }?>" class="resForm">
     <a class="nextPage" href="tables.php">Back</a>
     <?php if ($_GET['table'] > 1) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] - 1) . "\">Previous table</a>"; ?>
     <?php if ($_GET['table'] < $_SESSION['maxTableId']) echo "<a class=\"nextPage\" href=\"reservation.php?table=" . ($_GET['table'] + 1) . "\">Next table</a>";
@@ -223,6 +226,9 @@ if(isset($_SESSION['discountCode'])) {
     $insert_sql = $conn->prepare("INSERT INTO reservation (tableId, userId, reservationDay, reservationTime, period,reservationCode,discount) VALUES (?, ?, ?, ?,?, ?,?)");
     $insert_sql->bind_param("iisssii", $_GET['table'], $_SESSION['userID'], $_POST['day'], $_SESSION['reservationTime'],
         $_POST['reservationTimeEnd'],$_SESSION['reservationCode'],$_SESSION['discountCode']);
+    $sql2 = $conn->prepare("UPDATE coupon SET discountValidate=0 WHERE discountCode=?");
+    $sql2->bind_param('s', $_SESSION['discountCode']);
+    $sql2->execute();
 }
 else{
     $insert_sql = $conn->prepare("INSERT INTO reservation (tableId, userId, reservationDay, reservationTime, period,reservationCode) VALUES (?, ?, ?, ?, ?,?)");
@@ -238,6 +244,8 @@ else{
                 $_SESSION['reservationTable'] = $_GET['table'];
                 $_SESSION['reservationTimeEnd'] = $_POST['reservationTimeEnd'];
                 $_SESSION['day'] = $_POST['day'];
+                $_SESSION['couponDiscount']=1;
+
                 header('location:mail.php');
                 exit();
 

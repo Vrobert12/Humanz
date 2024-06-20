@@ -221,7 +221,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['pr
             echo ' <div class="col-xl-4 p-3 border bg-dark" style="  
  margin: auto; margin-top:100px; margin-bottom: 50px;left:0; right:0; width: fit-content">';
             echo "<div class=\"col-xl-4 \"><img class=\"profilePic\" 
-src=\"http://localhost/Restaurant/pictures/" . $row['dishPicture'] . "
+src=\"https://humanz.stud.vts.su.ac.rs/Restaurant/pictures/" . $row['dishPicture'] . "
           \" width=\"250\" height=\"250\" alt=\"profilkep\"></div><br>
           
 <label>Dish  Name: " . $row['dishName'] . "</label><br>

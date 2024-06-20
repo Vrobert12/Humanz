@@ -173,7 +173,7 @@
 
                     </ul> </nav> </div> </li> </ul> </div> </div> </nav>
 <?php
-if(isset($_SESSION['message']) && $_SESSION['message'] != "")
+if(isset($_SESSION['message']) && $_SESSION['message'] != "") {
     echo "<div class='mainBlock rounded bg-dark text-white' style='text-align: center; margin-top: 100px;'>
           <h1 style='margin: auto;'>
               " . $_SESSION['message'] . "
@@ -184,22 +184,21 @@ if(isset($_SESSION['message']) && $_SESSION['message'] != "")
               Okay
           </a>
       </div>";
-$_SESSION['message'] = "";
-?>
-
-</body>
-</html>
-<?php
-
+    $_SESSION['message'] = "";
+}
 if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['profilePic'])) {
 
     if (isset($_POST['searchAction']) && !empty($_POST['searchDate'])) {
         $searchDate = $_POST['searchDate'];
-        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount FROM reservation WHERE reservationDay = ? GROUP BY reservationDay DESC");
+        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount FROM reservation WHERE reservationDay = ? GROUP BY reservationDay ORDER BY reservationDay DESC");
         $sql->bind_param("s", $_POST['searchDate']);
         $reservationLength = 1; // Only show results for the searched date
     } else {
-        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount FROM reservation GROUP BY reservationDay DESC");
+        $sql = mysqli_prepare($conn, "SELECT reservationDay, COUNT(*) as reservationCount
+FROM reservation
+GROUP BY reservationDay
+ORDER BY reservationDay DESC;
+");
         $reservationLength = 7; // Show results for the last 7 days if no specific date is searched
     }
 
@@ -252,3 +251,5 @@ if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['pr
 }
 ?>
 
+</body>
+</html>

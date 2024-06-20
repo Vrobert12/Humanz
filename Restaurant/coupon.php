@@ -54,7 +54,7 @@
 
 
                             echo '<li><form method="post" action="coupon.php"></li>
-            <input type="text" style="width: 300px; font-size: 30px; height: 50px;" placeholder="YYYY-MM-DD" name="searchDate">
+            <input type="text" style="width: 300px; font-size: 30px; height: 50px;" placeholder="Discount" name="searchDate">
               
             <li> <a class="justify-content-end" onclick="activateSearch()"><i class="fa-2x bi bi-search"></i></a></li>
          <li><a class="justify-content-end" onclick="deleteSearch()"><i class="fa-2x bi bi-x-lg"></i></a></li>

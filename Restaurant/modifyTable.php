@@ -55,6 +55,7 @@ if( $_SESSION['privalage'] != "admin" && $_SESSION['privalage'] != "worker"){
     <input type="text" class="inputok" placeholder="Area" name="ar" id="ar"><br>
     <label for="ar">Is smoking area: </label>
     <input type="checkbox" class="inputok" name="sm" id="sm"><br>
+    <textarea class="inputok" name="description" id="description"></textarea><br>
     <input type="submit" class="inputok" name="action" value="ModifyTable">
     <?php
 

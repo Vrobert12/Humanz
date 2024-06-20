@@ -14,13 +14,15 @@ if (isset($_POST['reservationDay'])) {
     $reservationDay = $_POST['reservationDay'];
 
     // Prepare SQL statement with parameter binding to avoid SQL injection
-    $sql = $conn->prepare("SELECT r.reservationId, r.tableId, r.userId, r.reservationDay, r.reservationTime, r.period, r.discount as discountCode,
-       CONCAT(u.firstName, ' ', u.lastName) AS userName,c.discount
+    $sql = $conn->prepare("SELECT r.reservationId, r.tableId, r.userId, r.reservationDay, r.reservationTime, r.period, 
+       IFNULL(r.discount, '') AS discountCode, CONCAT(u.firstName, ' ', u.lastName) AS userName, 
+       IFNULL(c.discount, '') AS discount
 FROM reservation r
-JOIN coupon c ON r.discount = c.discountCode
+LEFT JOIN coupon c ON r.discount = c.discountCode
 JOIN user u ON u.userId = r.userId
-WHERE  r.reservationDay = ?
+WHERE r.reservationDay = ?
 ORDER BY r.reservationTime ASC;
+
 
 ");
     $sql->bind_param("s", $reservationDay); // Bind parameter

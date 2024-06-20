@@ -80,6 +80,7 @@ $_SESSION['email']=$_SESSION['mailReset'];
         $mail->AltBody = "<h2>You have reserved our table </h2>  Reservation is on day <b>".$_SESSION['day']."</b> from <b>"
             .$_SESSION['reservationTime']."</b> to <b>".$_SESSION['reservationTimeEnd'].". Your reservation code is: ".$_SESSION['reservationCode']."</b>";
         unset($_SESSION['workerEmail']);
+        unset($_SESSION['reservationCode']);
         header('Location:reservation.php?table='.$_SESSION['reservationTable']);
     }
     $mail->send();
