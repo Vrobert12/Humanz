@@ -50,11 +50,13 @@ global $conn;
                             echo "<li><a class=\"d-block d-lg-none \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i></a></li>";
                             echo "<li><a class=\"d-block d-lg-none \" href=\"reports.php\"><i class=\"fa-2x bi bi-journal-bookmark\"></i></a></li>";
                             echo "<li><a class=\"d-block d-lg-none \" href=\"menu.php\"><i class=\"fa-2x bi bi-egg-fried\"></i></a></li>";
+                            echo "<li><a class=\"d-block d-lg-none \" href=\"coupon.php\"><i class=\"fa-2x bi bi-ticket\"></i></a></li>";
 
                             echo "<li><a class=\"d-none d-lg-block \" href=\"users.php\"><i class=\"fa-2x bi bi-people\"></i> Users</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"workers.php\"><i class=\"fa-2x bi bi-person-workspace\"></i> Workers</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"reports.php\"><i class=\"fa-2x bi bi-journal-bookmark\"></i> Reports</a></li>";
                             echo "<li><a class=\"d-none d-lg-block \" href=\"menu.php\"><i class=\"fa-2x bi bi-egg-fried\"></i> Menu</a></li>";
+                            echo "<li><a class=\"d-none d-lg-block \" href=\"coupon.php\"><i class=\"fa-2x bi bi-ticket\"></i> Coupons</a></li>";
 
                             require 'counter.php';
                         } elseif ($_SESSION['email'] == $row['userMail'] && $row['privilage'] == "Worker") {

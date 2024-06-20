@@ -57,6 +57,9 @@ class Functions
                 case 'ModifyDish':
                     $this->modifyMenu();
                     break;
+                case 'AddCoupon':
+                    $this->addCoupon();
+                    break;
                 case 'BanPerson':
                 case 'UnBanPerson':
                     $this->ban();
@@ -78,6 +81,64 @@ class Functions
                     break;
 
             }
+        }
+    }
+    public function addCoupon()
+    {
+        if (isset($_POST['discount']) ) {
+            global $conn;
+    
+            $discount = $_POST['discount'];
+
+            $discountCode=substr(number_format(time() * rand(), 0, '', ''), 0, 8);
+            if ($discount == 'Discount') {
+                $_SESSION['message'] = "The discount must have been selected";
+                header('Location:addCoupon.php');
+                exit();
+            }
+
+
+
+            $sql = mysqli_prepare($conn, "SELECT * FROM coupon WHERE discountValidate=1 ORDER BY discount DESC");
+        $sql->execute();
+        $result = $sql->get_result();
+            $checker=1;
+        // Check if there are results to display
+        if ($result->num_rows > 0 && $checker==1)
+          while ($row = $result->fetch_assoc())
+              $checker=0;
+            if($row['discountCode']==$discountCode){
+                $_SESSION['message'] = "The discount Code is already in database";
+                $checker=1;
+            }
+
+
+            try {
+$couponIsValid=1;
+                $sql = "INSERT INTO coupon( discount, discountCode, discountValidate) VALUES (?,?,?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("iii", $discount, $discountCode , $couponIsValid);
+                if ($stmt->execute()) {
+
+                    $_SESSION['message'] = "Coupon added successfully!";
+                    $_SESSION['text'] = "<h2>Add Coupon</h2>";
+                    header('Location: coupon.php');
+                    exit(); // Exit script after redirection
+                } else {
+                    $_SESSION['message'] = "Error occurred during adding table: " . $conn->error;
+                    header('Location: addTable.php?token=' . $_SESSION['token']);
+                    exit();
+                }
+            } catch (Exception $e) {
+                $_SESSION['message'] = "An error occurred: " . $e->getMessage();
+                header('Location:addMenu.php');
+                exit();
+            }
+        } else {
+
+            $_SESSION['message'] = "An error occurred: ";
+            header('Location:addMenu.php');
+            exit();
         }
     }
     public function modifyMenu()
@@ -224,7 +285,7 @@ class Functions
             }
 
             if (!is_numeric($dishPrice)) {
-                $_SESSION['message'] = "The dish price can not contain number";
+                $_SESSION['message'] = "The dish price has to contain number";
                 header('Location:addMenu.php');
                 exit();
             }
@@ -805,7 +866,7 @@ VALUES (?,?,?,?, ?,? ,?, ?,?, ?,?,?,?,?)";
 
                     // Assuming 'profilkep' is a column in your table
                     if ($target == "index.php" || $target == "users.php" || $target == "workers.php" || $target == "tables.php"
-                        || $target == "reports.php" || $target == "menu.php") {
+                        || $target == "reports.php" || $target == "menu.php" || $target == "coupon.php") {
 
                         $query = mysqli_prepare($conn, "UPDATE user SET profilePic = ? WHERE userMail= ?");
                         $query->bind_param("ss", $new_file_name, $_SESSION['email']);

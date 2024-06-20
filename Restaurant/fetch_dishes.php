@@ -12,7 +12,7 @@ if (isset($_GET['dishType'])) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             echo '<div class="row align-items-start">';
-            echo '<div class="col"><img src="' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
+            echo '<div class="col"><img src="http://localhost/Restaurant/pictures/' . $row['dishPicture'] . '" alt="img" width="120px" height="120px"/></div>';
             echo "<div class='col'><div class='row align-items-start'><label>Name: " . $row['dishName'] . " (" . $row['dishType'] . ")</label></div>";
             echo "<div class='row align-items-start'><label>Price: " . $row['dishPrice'] . "€</label></div>";
             echo '</div></div>';

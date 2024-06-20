@@ -62,10 +62,7 @@
         </form>
            <a href="#" class="bar d-block d-lg-none"><h2><i class=" fa-3x bi bi-pc-display-horizontal"></i>  </h2></a>
             <a href="#" class="bar d-none d-lg-block"> <h2>  Reports</h2></a>';
-                            $_SESSION['token'] =  substr(number_format(time() * rand(), 0, '', ''), 0, 6);
-                            $_SESSION['previousPage']="reports.php";
-                            echo "<li><a class=\"justify-content-end\" href=\"registration.php?token=" . $_SESSION['token']. "\" style='font-size: 40px'><i class=\"bi bi-plus\"></i></a></li>";
-                        }
+                          }
 
             } else {
 
@@ -228,7 +225,7 @@ if (isset($_SESSION['email']) && isset($_SESSION['name']) && isset($_SESSION['pr
 
         $reservationCount = isset($reservations[$day]) ? $reservations[$day] : 0;
         echo '<div class="col-xl-4 p-3 border bg-dark" style="margin: auto; margin-top:100px; margin-bottom: 50px; left:0; right:0; width: fit-content">';
-        echo "<label>Reservation Day: " . $day . "</label><br>";
+        echo "<label>Reservation Date: " . $day . "</label><br>";
         if ($reservationCount > 0) {
             echo "<label>Number of Reservations: " . $reservationCount . "</label><br>";
             echo '<form method="post" action="generate_pdf.php" target="_blank">
